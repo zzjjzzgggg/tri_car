@@ -1,0 +1,8 @@
+.cproject
+.project
+.settings/
+*.o
+*.Err
+main
+*.dat
+*.txt
