@@ -94,7 +94,7 @@ void em_estimate(){
 		printf("Not converging, quit without saving results.");
 }
 
-void em_sub(TFltV& AvgThV, int& NSuc, const TStr GFnm, const int W, const int M, const int N, const double p, const int Rpt){
+void em_sub(TFltV& AvgThV, int& NSuc, const TStr& GFnm, const int W, const int M, const int N, const double p, const int Rpt){
 	const double P = pow(p, 3);
 	NSuc = 0;
 	PNEGraph G = PNEGraph::TObj::New();
@@ -123,7 +123,7 @@ void em_sub(TFltV& AvgThV, int& NSuc, const TStr GFnm, const int W, const int M,
 }
 
 void em_multi(){
-	int W=1000, M=200, N=27770, Rpt=100;
+	int W=1000, M=200, N=27770, Rpt=10;
 	double p=0.2;
 	TStr GFnm = DG_HEPTH;
 	TFltV AvgThV1(W+1), AvgThV2(W+1), AvgThV3(W+1), AvgThV4(W+1), AvgThV5(W+1);
@@ -139,6 +139,7 @@ void em_multi(){
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
 	for(std::thread& t: threads) t.join();
 
+	printf("Saving...\n");
 	for (int i=0; i<=W; i++) {
 		AvgThV1[i] += (AvgThV2[i] + AvgThV3[i] + AvgThV4[i] + AvgThV5[i]);
 		AvgThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
