@@ -123,17 +123,17 @@ void em_sub(TFltV& AvgThV, int& NSuc, const TStr& GFnm, const int W, const int M
 }
 
 void em_multi(){
-	int W=1000, M=200, N=27770, Rpt=10;
+	int W=1000, M=200, N=27770, PerRpt=10;
 	double p=0.2;
 	TStr GFnm = DG_HEPTH;
 	TFltV AvgThV1(W+1), AvgThV2(W+1), AvgThV3(W+1), AvgThV4(W+1), AvgThV5(W+1);
-	int NSuc1, NSuc2, NSuc3, NSuc4, NSuc5;
+	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
 	std::vector<std::function<void()>> vec {
-		[&AvgThV1, &NSuc1, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV1, NSuc1, GFnm, W, M, N, p, Rpt/5); },
-		[&AvgThV2, &NSuc2, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV2, NSuc2, GFnm, W, M, N, p, Rpt/5); },
-		[&AvgThV3, &NSuc3, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV3, NSuc3, GFnm, W, M, N, p, Rpt/5); },
-		[&AvgThV4, &NSuc4, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV4, NSuc4, GFnm, W, M, N, p, Rpt/5); },
-		[&AvgThV5, &NSuc5, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV5, NSuc5, GFnm, W, M, N, p, Rpt/5); },
+		[&AvgThV1, &NSuc1, &GFnm, W, M, N, p, PerRpt] () { em_sub(AvgThV1, NSuc1, GFnm, W, M, N, p, PerRpt); },
+		[&AvgThV2, &NSuc2, &GFnm, W, M, N, p, PerRpt] () { em_sub(AvgThV2, NSuc2, GFnm, W, M, N, p, PerRpt); },
+//		[&AvgThV3, &NSuc3, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV3, NSuc3, GFnm, W, M, N, p, Rpt/5); },
+//		[&AvgThV4, &NSuc4, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV4, NSuc4, GFnm, W, M, N, p, Rpt/5); },
+//		[&AvgThV5, &NSuc5, &GFnm, W, M, N, p, Rpt] () { em_sub(AvgThV5, NSuc5, GFnm, W, M, N, p, Rpt/5); },
 	};
 	std::vector<std::thread> threads;
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
@@ -144,7 +144,7 @@ void em_multi(){
 		AvgThV1[i] += (AvgThV2[i] + AvgThV3[i] + AvgThV4[i] + AvgThV5[i]);
 		AvgThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	BIO::SaveFltsWithIdx(AvgThV1, TStr::Fmt("../est_%s_p%g_r%d.dist", GFnm.GetFMid().CStr(), p, Rpt));
+	BIO::SaveFltsWithIdx(AvgThV1, TStr::Fmt("../est_%s_p%g_r%d.dist", GFnm.GetFMid().CStr(), p, PerRpt*vec.size()));
 
 }
 
