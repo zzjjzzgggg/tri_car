@@ -15,38 +15,41 @@
  */
 class TCEM {
 private:
-	int W, M, N, g;
+	int W, N, g, M;
 	double p;  /// p == p_delta
 	TFltV BV, ZV, ThV_pre;
 	TIntH gH;
 public:
 	TFltV ThV;
 public:
-	TCEM(const int W, const int M, const int N, const double p_delta, const TIntH& freqH): W(W), M(M), N(N), p(p_delta) {
-		g = 0;
+	TCEM(const int W, const int N, const double p_delta, const TIntH& freqH): W(W), N(N), p(p_delta) {
+		M = g = 0;
 		for (int i=0; i<freqH.Len(); i++) {
 			gH(freqH.GetKey(i)) = freqH[i];
 			g += freqH[i];
+			if (freqH.GetKey(i)>M) M = freqH.GetKey(i);
 		}
 		g -= gH(0);
 		gH(0) = N-g;
+		// init B
+		BV.Gen((W+1)*(M+1));
+		for(int j=0; j<=M; j++){
+			for (int i=j; i<=W; i++){
+				BV[Idx(i,j)] = TSpecFunc::Binomial(j, i, p);
+				IAssertR(BV[Idx(i,j)]>=0, TStr::Fmt("ER: %.6e", BV[Idx(i,j)].Val));
+			}
+		}
+		// init Theta
+		ThV.Gen(W+1); ThV_pre.Gen(W+1);
+		// space for Z
+		ZV.Gen((W+1)*(M+1));
 	};
 	bool Run(const int max_iter = 1000);
-	void Save(TStr ofnm);
 private:
 	const int Idx(const int i, const int j){ return i*M+j; }
-	bool IsConverged(const double eps=0.001) {
-		double diff = 0;
-		for(int i=0; i<=W; i++) diff += TMath::Abs(ThV[i]-ThV_pre[i]);
-		double sum = 0;
-		for(int i=0; i<=W; i++) sum += ThV[i];
-		IAssertR(TMath::Abs(sum-1)<1E-9, TStr::Fmt("UN: %.6e", sum));
-		return diff<=eps;
-	}
-
 	void Init();
 	void EStep();
-	void MStep();
+	bool MStep(const double Eps=0.005);
 };
 
 #endif /* TCEM_H_ */

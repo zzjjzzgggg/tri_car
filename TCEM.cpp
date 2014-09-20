@@ -8,19 +8,7 @@
 #include "TCEM.h"
 
 void TCEM::Init(){
-	// init B
-	BV.Gen((W+1)*(M+1));
-	for(int j=0; j<=M; j++){
-		for (int i=j; i<=W; i++){
-			BV[Idx(i,j)] = TSpecFunc::Binomial(j, i, p);
-			IAssertR(BV[Idx(i,j)]>=0, TStr::Fmt("ER: %.6e", BV[Idx(i,j)].Val));
-		}
-	}
-	// init Theta
-	ThV.Gen(W+1); ThV_pre.Gen(W+1);
 	TRandom::InitUni(ThV);
-	// space for Z
-	ZV.Gen((W+1)*(M+1));
 }
 
 /**
@@ -43,7 +31,7 @@ void TCEM::EStep(){
 /**
  * update ThV and Nt
  */
-void TCEM::MStep(){
+bool TCEM::MStep(const double Eps){
 	// store the old parameters before we update them
 	for (int i=0; i<=W; i++) {
 		ThV_pre[i] = ThV[i];
@@ -56,9 +44,14 @@ void TCEM::MStep(){
 			ThV[i] += ZV[Idx(i,j)];
 			norm += ZV[Idx(i,j)];
 		}
-	// normalize Thv
-	for (int i=0; i<=W; i++) ThV[i] /= norm;
-//	printf("N: %.2f  ", norm);
+	// normalize Thv and calculate diff
+	double diff = 0;
+	for (int i=0; i<=W; i++) {
+		ThV[i] /= norm;
+		diff += TMath::Abs(ThV[i]-ThV_pre[i]);
+		ThV_pre[i] = ThV[i];
+	}
+	return diff <= Eps;
 }
 
 /**
@@ -68,15 +61,8 @@ bool TCEM::Run(const int max_iter){
 	Init();
 	for (int iter=0; iter<max_iter; iter++){
 		EStep();
-		MStep();
-		if (IsConverged()) return true;
+		if(MStep()) return true;
 	}
 	return false;
-}
-
-void TCEM::Save(TStr ofnm){
-	FILE* fw = fopen(ofnm.CStr(), "w");
-	for (int i=0; i<=W; i++) fprintf(fw, "%d\t%.6e\n", i, ThV[i].Val);
-	fclose(fw);
 }
 

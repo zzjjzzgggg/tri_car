@@ -17,7 +17,6 @@ using namespace std;
 
 const static TStr GFNm = DG_HEPTH;
 const static int W = 1000;
-const static int M = 200;
 const static int N = 27770;
 const static double PEdge = 0.2;
 const static int PerRpt=10;
@@ -37,10 +36,9 @@ void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 		for (int i=0; i<TridCnt.Len(); i++){
 			const int key = TridCnt[i].Val1;
 			const int val = TridCnt[i].Val2;
-			if (key > M) break;
 			Freq(key) = val;
 		}
-		TCEM EM(W, M, N, PDelta, Freq);
+		TCEM EM(W, N, PDelta, Freq);
 		printf("Em running...\n");
 		if (EM.Run()) {
 			for (int i=0; i<=W; i++) ThV[i] += EM.ThV[i];
