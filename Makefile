@@ -8,7 +8,7 @@ LDFLAGS += -lrt -pthread -std=c++11
 
 SNAPDIR = /home/jzzhao/git_project/netsnap
 LIB = -I $(SNAPDIR)/glib -I $(SNAPDIR)/snap
-OBJ = Snap.o TCEM.o
+OBJ = Snap.o TCEM.o ExamMgr.o
 
 ## Main application file
 MAIN = main
@@ -24,6 +24,9 @@ $(MAIN): $(MAIN).cpp stdafx.h $(OBJ)
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $(MAIN) $<
 
 TCEM.o: TCEM.cpp TCEM.h stdafx.h Snap.o
+	g++ -c $(DEBUG) $(CXXFLAGS) $(LIB) $<
+
+ExamMgr.o: ExamMgr.cpp ExamMgr.h stdafx.h Snap.o
 	g++ -c $(DEBUG) $(CXXFLAGS) $(LIB) $<
 
 Snap.o: 
