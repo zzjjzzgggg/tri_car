@@ -123,7 +123,7 @@ void em_sub(TFltV& AvgThV, int& NSuc, const TStr& GFnm, const int W, const int M
 }
 
 void em_multi(){
-	int W=1000, M=200, N=27770, PerRpt=10;
+	int W=1000, M=200, N=27770, PerRpt=2;
 	double p=0.2;
 	TStr GFnm = DG_HEPTH;
 	TFltV AvgThV1(W+1), AvgThV2(W+1), AvgThV3(W+1), AvgThV4(W+1), AvgThV5(W+1);
