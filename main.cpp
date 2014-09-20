@@ -129,9 +129,9 @@ void em_multi(){
 	std::vector<std::function<void()>> vec {
 		[&AvgThV1, &NSuc1, W, M, N, p, PerRpt] () { em_sub(AvgThV1, NSuc1, DG_HEPTH, W, M, N, p, PerRpt); },
 		[&AvgThV2, &NSuc2, W, M, N, p, PerRpt] () { em_sub(AvgThV2, NSuc2, DG_HEPTH, W, M, N, p, PerRpt); },
-		[&AvgThV3, &NSuc3, W, M, N, p, PerRpt] () { em_sub(AvgThV3, NSuc3, DG_HEPTH, W, M, N, p, PerRpt); },
-		[&AvgThV4, &NSuc4, W, M, N, p, PerRpt] () { em_sub(AvgThV4, NSuc4, DG_HEPTH, W, M, N, p, PerRpt); },
-		[&AvgThV5, &NSuc5, W, M, N, p, PerRpt] () { em_sub(AvgThV5, NSuc5, DG_HEPTH, W, M, N, p, PerRpt); },
+		//[&AvgThV3, &NSuc3, W, M, N, p, PerRpt] () { em_sub(AvgThV3, NSuc3, DG_HEPTH, W, M, N, p, PerRpt); },
+		//[&AvgThV4, &NSuc4, W, M, N, p, PerRpt] () { em_sub(AvgThV4, NSuc4, DG_HEPTH, W, M, N, p, PerRpt); },
+		//[&AvgThV5, &NSuc5, W, M, N, p, PerRpt] () { em_sub(AvgThV5, NSuc5, DG_HEPTH, W, M, N, p, PerRpt); },
 	};
 	std::vector<std::thread> threads;
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
