@@ -19,10 +19,9 @@ const TStr DG_TEST = "../test_dir_graph.txt";
 const TStr DG_TRIADS = "../non_zero_triads.digraph.gz";
 
 void test(){
-	printf("%s\n", DG_TRIADS.GetFBase().CStr());
-	printf("%s\n", DG_TRIADS.GetFMid().CStr());
-	printf("%s\n", DG_TRIADS.GetFPath().CStr());
-	printf("%s\n", DG_TRIADS.GetFNmStr("xx.dd").CStr());
+	double sum=0;
+	for(int i=0;i<=1000;i++) sum+=TSpecFunc::Binomial(i, 1000, 0.001);
+	printf("sum = %.6e\n", sum);
 }
 
 void gen_test_data(){
@@ -123,8 +122,8 @@ void em_sub(TFltV& AvgThV, int& NSuc, const TStr& GFnm, const int W, const int M
 }
 
 void em_multi(){
-	int W=1000, M=200, N=27770, PerRpt=2;
-	double p=0.2;
+	int W=1000, M=100, N=27770, PerRpt=10;
+	double p=0.1;
 	TStr GFnm = DG_HEPTH;
 	TFltV AvgThV1(W+1), AvgThV2(W+1), AvgThV3(W+1), AvgThV4(W+1), AvgThV5(W+1);
 	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
@@ -144,8 +143,9 @@ void em_multi(){
 		AvgThV1[i] += (AvgThV2[i] + AvgThV3[i] + AvgThV4[i] + AvgThV5[i]);
 		AvgThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	BIO::SaveFltsWithIdx(AvgThV1, TStr::Fmt("../est_%s_p%g_r%d.dist", GFnm.GetFMid().CStr(), p, PerRpt*vec.size()));
-
+	TStr OFnm = TStr::Fmt("../est_%s_p%g_r%d.dist", GFnm.GetFMid().CStr(), p, PerRpt*vec.size());
+	BIO::SaveFltsWithIdx(AvgThV1, OFnm);
+	printf("Saved to %s\n", OFnm.CStr());
 }
 
 int main(int argc, char* argv[]){

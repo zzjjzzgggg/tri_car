@@ -38,7 +38,6 @@ private:
 	bool IsConverged(const double eps=0.001) {
 		double diff = 0;
 		for(int i=0; i<=W; i++) diff += TMath::Abs(ThV[i]-ThV_pre[i]);
-//		printf("diff: %.6f\n", diff);
 		double sum = 0;
 		for(int i=0; i<=W; i++) sum += ThV[i];
 		IAssertR(TMath::Abs(sum-1)<1E-9, TStr::Fmt("UN: %.6e", sum));

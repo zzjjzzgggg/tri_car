@@ -12,7 +12,7 @@ void TCEM::Init(){
 	BV.Gen((W+1)*(M+1));
 	for(int j=0; j<=M; j++){
 		for (int i=j; i<=W; i++){
-			BV[Idx(i,j)] = TSpecFunc::Binormal(j, i, p);
+			BV[Idx(i,j)] = TSpecFunc::Binomial(j, i, p);
 			IAssertR(BV[Idx(i,j)]>=0, TStr::Fmt("ER: %.6e", BV[Idx(i,j)].Val));
 		}
 	}
