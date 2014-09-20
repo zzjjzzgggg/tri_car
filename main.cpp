@@ -19,7 +19,7 @@ const static TStr GFNm = DG_HEPTH;
 const static int W = 1000;
 const static int N = 27770;
 const static double PEdge = 0.2;
-const static int PerRpt=10;
+const static int PerRpt=20;
 
 void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	const double PDelta = pow(PEdge, 3);
@@ -75,7 +75,9 @@ void em_multi(){
 }
 
 int main(int argc, char* argv[]){
+	TExeTm2 tm;
 	em_multi();
+	printf("Cost time: %s.", tm.GetStr());
 	return 0;
 }
 
