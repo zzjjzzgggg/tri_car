@@ -19,10 +19,9 @@ const TStr DG_TEST = "../test_dir_graph.txt";
 const TStr DG_TRIADS = "../non_zero_triads.digraph.gz";
 
 void test(){
-	printf("%s\n", DG_TRIADS.GetFBase().CStr());
-	printf("%s\n", DG_TRIADS.GetFMid().CStr());
-	printf("%s\n", DG_TRIADS.GetFPath().CStr());
-	printf("%s\n", DG_TRIADS.GetFNmStr("xx.dd").CStr());
+	double sum=0;
+	for(int i=0;i<=1000;i++) sum+=TSpecFunc::Binomial(i, 1000, 0.001);
+	printf("sum = %.6e\n", sum);
 }
 
 void gen_test_data(){
@@ -123,7 +122,7 @@ void em_sub(TFltV& AvgThV, int& NSuc, const TStr& GFnm, const int W, const int M
 }
 
 void em_multi(){
-	int W=1000, M=200, N=27770, PerRpt=10;
+	int W=1000, M=100, N=27770, PerRpt=10;
 	double p=0.1;
 	TStr GFnm = DG_HEPTH;
 	TFltV AvgThV1(W+1), AvgThV2(W+1), AvgThV3(W+1), AvgThV4(W+1), AvgThV5(W+1);
