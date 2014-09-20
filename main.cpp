@@ -18,7 +18,7 @@ using namespace std;
 const static TStr GFNm = DG_HEPTH;
 const static int W = 1000;
 const static int N = 27770;
-const static double PEdge = 0.2;
+const static double PEdge = 0.1;
 const static int PerRpt=20;
 
 void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
@@ -77,7 +77,7 @@ void em_multi(){
 int main(int argc, char* argv[]){
 	TExeTm2 tm;
 	em_multi();
-	printf("Cost time: %s.", tm.GetStr());
+	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
 
