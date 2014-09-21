@@ -11,13 +11,12 @@
 #include "stdafx.h"
 
 class ExamMgr {
-private:
+public:
 	typedef PNEGraph::TObj::TEdgeI EI;
 	PNEGraph GFull;
-	double PEdge;
 public:
-	ExamMgr(const TStr& GFnm, const double PEdge);
-	void GetSampledGraph(PNEGraph& G);
+	ExamMgr(const TStr& GFnm);
+	void GetSampledGraph(PNEGraph& G, const double PEdge);
 };
 
 #endif /* EXAMMGR_H_ */

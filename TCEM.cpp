@@ -7,10 +7,6 @@
 
 #include "TCEM.h"
 
-void TCEM::Init(){
-	TRandom::InitUni(ThV);
-}
-
 /**
  * update [z_ij]
  */
@@ -49,7 +45,6 @@ bool TCEM::MStep(const double Eps){
 	for (int i=0; i<=W; i++) {
 		ThV[i] /= norm;
 		diff += TMath::Abs(ThV[i]-ThV_pre[i]);
-		ThV_pre[i] = ThV[i];
 	}
 	return diff <= Eps;
 }
@@ -58,7 +53,6 @@ bool TCEM::MStep(const double Eps){
  * do EM iterations
  */
 bool TCEM::Run(const int max_iter){
-	Init();
 	for (int iter=0; iter<max_iter; iter++){
 		EStep();
 		if(MStep()) return true;

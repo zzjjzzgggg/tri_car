@@ -7,14 +7,14 @@
 
 #include "ExamMgr.h"
 
-ExamMgr::ExamMgr(const TStr& GFnm, const double PEdge) {
+ExamMgr::ExamMgr(const TStr& GFnm) {
 	// TODO Auto-generated constructor stub
-	this->PEdge = PEdge;
 	GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
 }
 
-void ExamMgr::GetSampledGraph(PNEGraph& G){
+void ExamMgr::GetSampledGraph(PNEGraph& G, const double PEdge){
 	TRnd rnd;
+	G->Clr();
 	for(EI ei=GFull->BegEI(); ei!=GFull->EndEI(); ei++){
 		if(rnd.GetUniDev() > PEdge) continue;
 		const int src = ei.GetSrcNId(), dst = ei.GetDstNId();
