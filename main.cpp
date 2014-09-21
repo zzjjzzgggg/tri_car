@@ -118,7 +118,7 @@ void em_multi_n_unknown(){
 		ThV1[i] += (ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i]);
 		ThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	TStr OFnm = TStr::Fmt("th_%s_p%g_r%d.dist", GFNm.GetFMid().CStr(),
+	TStr OFnm = TStr::Fmt("n_th_%s_p%g_r%d.dist", GFNm.GetFMid().CStr(),
 		PEdge, PerRpt*vec.size());
 	BIO::SaveFltsWithIdx(ThV1, OFnm, "# The first line denotes the estimated N");
 	printf("Saved to %s\n", OFnm.CStr());
