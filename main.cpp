@@ -19,7 +19,7 @@ using namespace std;
 const static TStr GFNm = DG_HEPTH;
 const static int W = 1000;
 const static int N = 27770;
-const static double PEdge = 0.2;
+const static double PEdge = 0.3;
 const static int PerRpt=20;
 
 
