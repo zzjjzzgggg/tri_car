@@ -114,7 +114,7 @@ void em_multi_n_unknown(){
 	for(std::thread& t: threads) t.join();
 
 	printf("Saving...\n");
-	for (int i=1; i<=W; i++) {
+	for (int i=0; i<=W; i++) {
 		ThV1[i] += (ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i]);
 		ThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
