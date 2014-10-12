@@ -22,6 +22,64 @@ const static int N = 27770;
 const static double PEdge = 0.3;
 const static int PerRpt=20;
 
+void count_triangles(){
+	PNEGraph G = PNEGraph::TObj::New();
+	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
+	int pre_week = 0, ntrid = 0;
+	TIntPrV TridCnt; TIntV NTridsPerWeek;
+	TSsParser Ss(Root+"enron_add_week_no.gz");
+	while(Ss.Next()){
+		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
+		if(week!=pre_week && G->GetEdges()!=0) {
+			TSnap::GetTriadParticipAll(G, TridCnt);
+			for (int i=0; i<TridCnt.Len(); i++) ntrid += TridCnt[i].Val1*TridCnt[i].Val2;
+			NTridsPerWeek.Add(ntrid/3);
+			G->Clr(); TridCnt.Clr(); pre_week = week; ntrid = 0;
+		}
+		if (!G->IsNode(fid)) G->AddNode(fid);
+		if (!G->IsNode(tid)) G->AddNode(tid);
+		G->AddEdge(fid, tid);
+	}
+	BIO::SaveIntsWithIdx(NTridsPerWeek, Root+"NTridsPerWeek.dat");
+}
+
+void dist_triangles(const int WK){
+	PNEGraph G = PNEGraph::TObj::New();
+	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
+	TSsParser Ss(Root+"enron_add_week_no.gz");
+	while(Ss.Next()){
+		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
+		if(week==WK) {
+			if (!G->IsNode(fid)) G->AddNode(fid);
+			if (!G->IsNode(tid)) G->AddNode(tid);
+			G->AddEdge(fid, tid);
+		}else if(week>WK) break;
+	}
+	TIntPrV TridCnt;
+	TSnap::GetTriadParticipAll(G, TridCnt);
+	int ntrid =0;
+	for (int i=0; i<TridCnt.Len(); i++) ntrid += TridCnt[i].Val1*TridCnt[i].Val2;
+	ntrid /= 3;
+	BIO::SaveIntPrV(TridCnt, Root+TStr::Fmt("TridCnt_%d.dat", WK));
+}
+
+
+void dist_degree(const int WK){
+	PNEGraph G = PNEGraph::TObj::New();
+	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
+	TSsParser Ss(Root+"enron_add_week_no.gz");
+	while(Ss.Next()){
+		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
+		if(week==WK) {
+			if (!G->IsNode(fid)) G->AddNode(fid);
+			if (!G->IsNode(tid)) G->AddNode(tid);
+			G->AddEdge(fid, tid);
+		}else if(week>WK) break;
+	}
+	TIntPrV DegV;
+	TSnap::GetDegCnt<PNEGraph>(G, DegV);
+	BIO::SaveIntPrV(DegV, Root+TStr::Fmt("DegCnt_%d.dat", WK));
+}
 
 void em_sub_n_known(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	const double PDelta = pow(PEdge, 3);
@@ -163,8 +221,11 @@ int main(int argc, char* argv[]){
 //	verify();
 //	em_single();
 //	em_multi();
-	em_multi_n_unknown();
+//	em_multi_n_unknown();
 //	eval_efficiency();
+//	count_triangles();
+//	dist_triangles(50);
+	dist_degree(20);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
