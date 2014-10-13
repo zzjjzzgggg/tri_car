@@ -86,6 +86,17 @@ void dist_degree(const int WK){
 	BIO::SaveIntPrV(DegV, Root+TStr::Fmt("DegCnt_%d.dat", WK));
 }
 
+void stat_trids(){
+	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
+	TIntPrV TridCnt;
+	for(PNEGraph::TObj::TNodeI NI=G->BegNI(); NI<G->EndNI(); NI++){
+		int nid = NI.GetId();
+		int ntrids = TSnap::GetNodeTriadsAll(G, nid);
+		TridCnt.Add(TIntPr(nid, ntrids));
+	}
+	BIO::SaveIntPrV(TridCnt, ROOT+"NodeNTrids.dat");
+}
+
 void em_sub_n_known(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	const double PDelta = pow(PEdge, 3);
 	NSuc = 0;
@@ -225,7 +236,8 @@ int main(int argc, char* argv[]){
 	TExeTm2 tm;
 //	verify();
 //	em_single();
-	em_multi_n_known();
+	stat_trids();
+//	em_multi_n_known();
 //	em_multi_n_unknown();
 //	eval_efficiency();
 //	count_triangles();
