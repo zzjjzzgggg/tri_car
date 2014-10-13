@@ -35,16 +35,17 @@ bool TCEM::MStep(const double Eps){
 	}
 	// now update
 	double norm = 0;
-	for (int j=0; j<=M; j++)
+	for (int j=0; j<=M; j++){
 		for(int i=j; i<=W; i++){
 			ThV[i] += ZV[Idx(i,j)];
 			norm += ZV[Idx(i,j)];
 		}
+	}
 	// normalize Thv and calculate diff
 	double diff = 0;
 	for (int i=0; i<=W; i++) {
 		ThV[i] /= norm;
-		diff += TMath::Abs(ThV[i]-ThV_pre[i]);
+		diff += TMath::Abs(ThV[i] - ThV_pre[i]);
 	}
 	return diff <= Eps;
 }

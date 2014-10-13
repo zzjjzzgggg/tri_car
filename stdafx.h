@@ -5,8 +5,10 @@
 #include "/home/jzzhao/git_project/netsnap/snap/Snap.h"
 
 
-
-const static TStr DG_HEPTH = "../cit-HepTh.gz";
+const static TStr ROOT = "../hepth/";
+const static TStr GFNm = "../hepth/cit-HepTh.gz";
+const static int W = 1000;
+const static int N = 27770;
 
 
 
