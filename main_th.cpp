@@ -21,7 +21,7 @@ void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	PNEGraph G = PNEGraph::TObj::New();
 	TIntPrV TridCnt;
 	for (int rpt=0; rpt<PerRpt; rpt++){
-		printf("\n\nrpt = %d\n", rpt);
+		printf("rpt = %d\n", rpt);
 		ExM.GetSampledGraph(G);
 		TridCnt.Clr();
 		TSnap::GetTriadParticipAll(G, TridCnt);
