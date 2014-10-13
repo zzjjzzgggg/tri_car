@@ -140,11 +140,11 @@ void em_multi_n_known(const double PEdge){
 	TFltV ThV1(W+1), ThV2(W+1), ThV3(W+1), ThV4(W+1), ThV5(W+1);
 	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
 	std::vector<std::function<void()>> vec = {
-		[&ThV1, &NSuc1, &ExM] { em_sub_n_known(PEdge, ThV1, NSuc1, ExM); },
-		[&ThV2, &NSuc2, &ExM] { em_sub_n_known(PEdge, ThV2, NSuc2, ExM); },
-		[&ThV3, &NSuc3, &ExM] { em_sub_n_known(PEdge, ThV3, NSuc3, ExM); },
-		[&ThV4, &NSuc4, &ExM] { em_sub_n_known(PEdge, ThV4, NSuc4, ExM); },
-		[&ThV5, &NSuc5, &ExM] { em_sub_n_known(PEdge, ThV5, NSuc5, ExM); },
+		[&PEdge, &ThV1, &NSuc1, &ExM] { em_sub_n_known(PEdge, ThV1, NSuc1, ExM); },
+		[&PEdge, &ThV2, &NSuc2, &ExM] { em_sub_n_known(PEdge, ThV2, NSuc2, ExM); },
+		[&PEdge, &ThV3, &NSuc3, &ExM] { em_sub_n_known(PEdge, ThV3, NSuc3, ExM); },
+		[&PEdge, &ThV4, &NSuc4, &ExM] { em_sub_n_known(PEdge, ThV4, NSuc4, ExM); },
+		[&PEdge, &ThV5, &NSuc5, &ExM] { em_sub_n_known(PEdge, ThV5, NSuc5, ExM); },
 	};
 	std::vector<std::thread> threads;
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
@@ -187,11 +187,11 @@ void em_multi_n_unknown(const double PEdge){
 	TFltV ThV1(W+1), ThV2(W+1), ThV3(W+1), ThV4(W+1), ThV5(W+1);
 	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
 	std::vector<std::function<void()>> vec = {
-		[&ThV1, &NSuc1, &ExM] { em_sub_n_unknown(PEdge, ThV1, NSuc1, ExM); },
-		[&ThV2, &NSuc2, &ExM] { em_sub_n_unknown(PEdge, ThV2, NSuc2, ExM); },
-		[&ThV3, &NSuc3, &ExM] { em_sub_n_unknown(PEdge, ThV3, NSuc3, ExM); },
-		[&ThV4, &NSuc4, &ExM] { em_sub_n_unknown(PEdge, ThV4, NSuc4, ExM); },
-		[&ThV5, &NSuc5, &ExM] { em_sub_n_unknown(PEdge, ThV5, NSuc5, ExM); },
+		[&PEdge, &ThV1, &NSuc1, &ExM] { em_sub_n_unknown(PEdge, ThV1, NSuc1, ExM); },
+		[&PEdge, &ThV2, &NSuc2, &ExM] { em_sub_n_unknown(PEdge, ThV2, NSuc2, ExM); },
+		[&PEdge, &ThV3, &NSuc3, &ExM] { em_sub_n_unknown(PEdge, ThV3, NSuc3, ExM); },
+		[&PEdge, &ThV4, &NSuc4, &ExM] { em_sub_n_unknown(PEdge, ThV4, NSuc4, ExM); },
+		[&PEdge, &ThV5, &NSuc5, &ExM] { em_sub_n_unknown(PEdge, ThV5, NSuc5, ExM); },
 	};
 	std::vector<std::thread> threads;
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
