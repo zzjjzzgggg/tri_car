@@ -97,6 +97,26 @@ void stat_trids(){
 	BIO::SaveIntPrV(TridCnt, ROOT+"NodeNTrids.dat");
 }
 
+void gen_ground_truth(){
+	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
+	double N = G->GetNodes();
+	TIntPrV tridCnt;
+	TExeTm2 tm;
+	TSnap::GetTriadParticipAll(G, tridCnt);
+	printf("time costs: %s\n", tm.GetStr());
+	TStr ofnm = ROOT+TStr::Fmt("groundtruth_W%dK.dat", GFNm.GetFMid().CStr(), W/1000);
+	FILE* fw=fopen(ofnm.CStr(), "w");
+	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
+	fprintf(fw, "# Nodes: %.0f\n", N);
+	for (int i=0; i<tridCnt.Len(); i++) {
+		int card = tridCnt[i].Val1;
+		int freq = tridCnt[i].Val2;
+		double prob = freq/N;
+		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
+	}
+	fclose(fw);
+}
+
 void em_sub_n_known(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	const double PDelta = pow(PEdge, 3);
 	NSuc = 0;
@@ -108,7 +128,7 @@ void em_sub_n_known(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 		ExM.GetSampledGraph(G, PEdge);
 		TridCnt.Clr();
 		TSnap::GetTriadParticipAll(G, TridCnt);
-		TCEM EM(W, N, PDelta, TridCnt);
+		TCEM EM(W, ExM.N, PDelta, TridCnt);
 		printf("Em running...\n");
 		if (EM.Run()) {
 			for (int i=0; i<=W; i++) ThV[i] += EM.ThV[i];
@@ -236,7 +256,8 @@ int main(int argc, char* argv[]){
 	TExeTm2 tm;
 //	verify();
 //	em_single();
-	stat_trids();
+//	stat_trids();
+	gen_ground_truth();
 //	em_multi_n_known();
 //	em_multi_n_unknown();
 //	eval_efficiency();

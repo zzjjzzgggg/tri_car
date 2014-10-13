@@ -10,6 +10,7 @@
 ExamMgr::ExamMgr(const TStr& GFnm) {
 	// TODO Auto-generated constructor stub
 	GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
+	N = GFull->GetNodes();
 }
 
 void ExamMgr::GetSampledGraph(PNEGraph& G, const double PEdge){
