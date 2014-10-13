@@ -7,7 +7,7 @@
 
 const static TStr ROOT = "../hepth/";
 const static TStr GFNm = "../cit-HepTh.gz";
-const static int W = 1000;
+const static int W = 1500;
 const static int N = 27770;
 
 
