@@ -55,8 +55,8 @@ void em_multi(const TStr& GFNm, const int W, const double PEdge){
 		ThV1[i] += (ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i]);
 		ThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	TStr OFnm = TStr::Fmt("%sth_%s_p%g_r%d.dist", GFNm.GetFPath().CStr(), GFNm.GetFMid().CStr(),
-		PEdge, PerRpt*vec.size());
+	TStr OFnm = TStr::Fmt("%sth_%s_W%dK_p%g_r%d.dist", GFNm.GetFPath().CStr(), GFNm.GetFMid().CStr(),
+		W/1000, PEdge, PerRpt*vec.size());
 	BIO::SaveFltsWithIdx(ThV1, OFnm);
 	printf("Saved to %s\n", OFnm.CStr());
 }
