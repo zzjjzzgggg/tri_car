@@ -19,4 +19,22 @@ const static TStr GFNm = "../cit-HepTh_W1K.gz";
 const static int W = 1000;
 #endif
 
+#ifdef HEPTH_W2K
+const static TStr ROOT = "../hepth/";
+const static TStr GFNm = "../cit-HepTh_W2K.gz";
+const static int W = 2000;
+#endif
+
+#ifdef HEPTH_W3K
+const static TStr ROOT = "../hepth/";
+const static TStr GFNm = "../cit-HepTh_W3K.gz";
+const static int W = 3000;
+#endif
+
+#ifdef HEPTH_W5K
+const static TStr ROOT = "../hepth/";
+const static TStr GFNm = "../cit-HepTh_W5K.gz";
+const static int W = 5000;
+#endif
+
 

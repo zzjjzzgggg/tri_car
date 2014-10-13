@@ -104,7 +104,7 @@ void gen_ground_truth(){
 	TExeTm2 tm;
 	TSnap::GetTriadParticipAll(G, tridCnt);
 	printf("time costs: %s\n", tm.GetStr());
-	TStr ofnm = ROOT+TStr::Fmt("groundtruth_W%dK.dat", GFNm.GetFMid().CStr(), W/1000);
+	TStr ofnm = ROOT+TStr::Fmt("groundtruth_W%dK.dat", W/1000);
 	FILE* fw=fopen(ofnm.CStr(), "w");
 	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
 	fprintf(fw, "# Nodes: %.0f\n", N);
