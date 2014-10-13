@@ -15,11 +15,12 @@
  */
 class TCEM {
 private:
-	int W, N, g, M;
+	int W, N, g;
 	double p;  /// p == p_delta
 	TFltV BV, ZV, ThV_pre;
 	TIntH gH;
 public:
+	int M;
 	TFltV ThV;
 public:
 	TCEM(const int W, const int N, const double p_delta, const TIntPrV& TridCnt): W(W), N(N), p(p_delta) {

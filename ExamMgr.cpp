@@ -25,5 +25,4 @@ void ExamMgr::GetSampledGraph(PNEGraph& G){
 		if(!G->IsNode(dst)) G->AddNode(dst);
 		G->AddEdge(src, dst);
 	}
-	printf("Sampled: \n\t nodes: %d, edges: %d\n", G->GetNodes(), G->GetEdges());
 }

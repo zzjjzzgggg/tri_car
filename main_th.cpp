@@ -27,6 +27,7 @@ void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 		TridCnt.Clr();
 		TSnap::GetTriadParticipAll(G, TridCnt);
 		TCEM EM(ExM.W, ExM.N, pow(ExM.PEdge, 3), TridCnt);
+		printf("Sampled:\t nodes: %d, edges: %d, M: %d\n", G->GetNodes(), G->GetEdges(), EM.M);
 		printf("Em running...\n");
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
