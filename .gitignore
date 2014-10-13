@@ -4,5 +4,8 @@
 *.o
 *.Err
 main
+main_th
+main_st
+main_nth
 *.dat
 *.txt
