@@ -10,18 +10,23 @@ SNAPDIR = /home/jzzhao/git_project/netsnap
 LIB = -I $(SNAPDIR)/glib -I $(SNAPDIR)/snap
 OBJ = Snap.o TCEM.o ExamMgr.o TCEMGeneral.o
 
-## Main application file
-MAIN = main
-
-all: $(MAIN)
+all: main_th
+th: main_th
+nth: main_nth
+st: main_st
 
 opt: CXXFLAGS += -O4
 opt: LDFLAGS += -O4
-opt: $(MAIN)
 
 # COMPILE
-$(MAIN): $(MAIN).cpp stdafx.h $(OBJ) 
-	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $(MAIN) $<
+main_th: main_th.cpp stdafx.h $(OBJ) 
+	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
+
+main_nth: main_nth.cpp stdafx.h $(OBJ) 
+	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
+	
+main_st: main_st.cpp stdafx.h $(OBJ) 
+	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 
 TCEMGeneral.o: TCEMGeneral.cpp TCEMGeneral.h stdafx.h Snap.o
 	g++ -c $(DEBUG) $(CXXFLAGS) $(LIB) $<

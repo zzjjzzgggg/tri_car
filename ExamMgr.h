@@ -14,10 +14,11 @@ class ExamMgr {
 public:
 	typedef PNEGraph::TObj::TEdgeI EI;
 	PNEGraph GFull;
-	int N;
+	int N, W;
+	double PEdge;
 public:
-	ExamMgr(const TStr& GFnm);
-	void GetSampledGraph(PNEGraph& G, const double PEdge);
+	ExamMgr(const TStr& GFnm, const int MX_TC, const double Pe);
+	void GetSampledGraph(PNEGraph& G);
 };
 
 #endif /* EXAMMGR_H_ */
