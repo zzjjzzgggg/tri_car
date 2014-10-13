@@ -257,8 +257,8 @@ int main(int argc, char* argv[]){
 //	verify();
 //	em_single();
 //	stat_trids();
-	gen_ground_truth();
-//	em_multi_n_known();
+//	gen_ground_truth();
+	em_multi_n_known();
 //	em_multi_n_unknown();
 //	eval_efficiency();
 //	count_triangles();
