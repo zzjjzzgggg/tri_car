@@ -6,6 +6,7 @@
 
 #define HEPTH_W1K
 
+const static int PerRpt=20;
 
 #ifdef HEPTH
 const static TStr ROOT = "../hepth/";

@@ -16,9 +16,6 @@
 
 using namespace std;
 
-const static double PEdge = 0.1;
-const static int PerRpt=20;
-
 /**
  * count triangles per week
  */
@@ -117,7 +114,7 @@ void gen_ground_truth(){
 	fclose(fw);
 }
 
-void em_sub_n_known(TFltV& ThV, int& NSuc, ExamMgr& ExM){
+void em_sub_n_known(const double PEdge, TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	const double PDelta = pow(PEdge, 3);
 	NSuc = 0;
 	PNEGraph G = PNEGraph::TObj::New();
@@ -138,16 +135,16 @@ void em_sub_n_known(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	printf("Experiment repeats %d times, and %d succeeded.\n", PerRpt, NSuc);
 }
 
-void em_multi_n_known(){
+void em_multi_n_known(const double PEdge){
 	ExamMgr ExM(GFNm);
 	TFltV ThV1(W+1), ThV2(W+1), ThV3(W+1), ThV4(W+1), ThV5(W+1);
 	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
 	std::vector<std::function<void()>> vec = {
-		[&ThV1, &NSuc1, &ExM] { em_sub_n_known(ThV1, NSuc1, ExM); },
-		[&ThV2, &NSuc2, &ExM] { em_sub_n_known(ThV2, NSuc2, ExM); },
-		[&ThV3, &NSuc3, &ExM] { em_sub_n_known(ThV3, NSuc3, ExM); },
-		[&ThV4, &NSuc4, &ExM] { em_sub_n_known(ThV4, NSuc4, ExM); },
-		[&ThV5, &NSuc5, &ExM] { em_sub_n_known(ThV5, NSuc5, ExM); },
+		[&ThV1, &NSuc1, &ExM] { em_sub_n_known(PEdge, ThV1, NSuc1, ExM); },
+		[&ThV2, &NSuc2, &ExM] { em_sub_n_known(PEdge, ThV2, NSuc2, ExM); },
+		[&ThV3, &NSuc3, &ExM] { em_sub_n_known(PEdge, ThV3, NSuc3, ExM); },
+		[&ThV4, &NSuc4, &ExM] { em_sub_n_known(PEdge, ThV4, NSuc4, ExM); },
+		[&ThV5, &NSuc5, &ExM] { em_sub_n_known(PEdge, ThV5, NSuc5, ExM); },
 	};
 	std::vector<std::thread> threads;
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
@@ -164,7 +161,7 @@ void em_multi_n_known(){
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
-void em_sub_n_unknown(TFltV& ThV, int& NSuc, ExamMgr& ExM){
+void em_sub_n_unknown(const double PEdge, TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	const double PDelta = pow(PEdge, 3);
 	NSuc = 0;
 	PNEGraph G = PNEGraph::TObj::New();
@@ -185,23 +182,16 @@ void em_sub_n_unknown(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	printf("Experiment repeats %d times, and %d succeeded.\n", PerRpt, NSuc);
 }
 
-void em_single(){
-	ExamMgr ExM(GFNm);
-	TFltV ThV(W+1);
-	int NSuc=0;
-	em_sub_n_unknown(ThV, NSuc, ExM);
-}
-
-void em_multi_n_unknown(){
+void em_multi_n_unknown(const double PEdge){
 	ExamMgr ExM(GFNm);
 	TFltV ThV1(W+1), ThV2(W+1), ThV3(W+1), ThV4(W+1), ThV5(W+1);
 	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
 	std::vector<std::function<void()>> vec = {
-		[&ThV1, &NSuc1, &ExM] { em_sub_n_unknown(ThV1, NSuc1, ExM); },
-		[&ThV2, &NSuc2, &ExM] { em_sub_n_unknown(ThV2, NSuc2, ExM); },
-		[&ThV3, &NSuc3, &ExM] { em_sub_n_unknown(ThV3, NSuc3, ExM); },
-		[&ThV4, &NSuc4, &ExM] { em_sub_n_unknown(ThV4, NSuc4, ExM); },
-		[&ThV5, &NSuc5, &ExM] { em_sub_n_unknown(ThV5, NSuc5, ExM); },
+		[&ThV1, &NSuc1, &ExM] { em_sub_n_unknown(PEdge, ThV1, NSuc1, ExM); },
+		[&ThV2, &NSuc2, &ExM] { em_sub_n_unknown(PEdge, ThV2, NSuc2, ExM); },
+		[&ThV3, &NSuc3, &ExM] { em_sub_n_unknown(PEdge, ThV3, NSuc3, ExM); },
+		[&ThV4, &NSuc4, &ExM] { em_sub_n_unknown(PEdge, ThV4, NSuc4, ExM); },
+		[&ThV5, &NSuc5, &ExM] { em_sub_n_unknown(PEdge, ThV5, NSuc5, ExM); },
 	};
 	std::vector<std::thread> threads;
 	for(const auto& f: vec) threads.emplace_back((std::function<void()>)f);
@@ -237,7 +227,7 @@ void eval_efficiency(){
 	}
 }
 
-void verify(){
+void verify(const double PEdge){
 	ExamMgr ExM(GFNm);
 	PNEGraph G = PNEGraph::TObj::New();
 	TIntPrV TridCnt;
@@ -253,12 +243,15 @@ void verify(){
 }
 
 int main(int argc, char* argv[]){
+	Env = TEnv(argc, argv, TNotify::StdNotify);
+	Env.PrepArgs();
+	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1.");
 	TExeTm2 tm;
 //	verify();
 //	em_single();
 //	stat_trids();
 //	gen_ground_truth();
-	em_multi_n_known();
+	em_multi_n_known(p);
 //	em_multi_n_unknown();
 //	eval_efficiency();
 //	count_triangles();
