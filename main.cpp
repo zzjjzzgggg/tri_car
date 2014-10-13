@@ -16,12 +16,12 @@
 
 using namespace std;
 
-const static TStr GFNm = DG_HEPTH;
-const static int W = 1000;
-const static int N = 27770;
-const static double PEdge = 0.3;
+const static double PEdge = 0.1;
 const static int PerRpt=20;
 
+/**
+ * count triangles per week
+ */
 void count_triangles(){
 	PNEGraph G = PNEGraph::TObj::New();
 	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
@@ -43,6 +43,9 @@ void count_triangles(){
 	BIO::SaveIntsWithIdx(NTridsPerWeek, Root+"NTridsPerWeek.dat");
 }
 
+/**
+ * triadic cardinality distribution
+ */
 void dist_triangles(const int WK){
 	PNEGraph G = PNEGraph::TObj::New();
 	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
@@ -63,7 +66,9 @@ void dist_triangles(const int WK){
 	BIO::SaveIntPrV(TridCnt, Root+TStr::Fmt("TridCnt_%d.dat", WK));
 }
 
-
+/**
+ * degree distribution
+ */
 void dist_degree(const int WK){
 	PNEGraph G = PNEGraph::TObj::New();
 	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
@@ -122,7 +127,7 @@ void em_multi_n_known(){
 		ThV1[i] += (ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i]);
 		ThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	TStr OFnm = TStr::Fmt("est_%s_p%g_r%d.dist", GFNm.GetFMid().CStr(),
+	TStr OFnm = ROOT + TStr::Fmt("th_%s_p%g_r%d.dist", GFNm.GetFMid().CStr(),
 		PEdge, PerRpt*vec.size());
 	BIO::SaveFltsWithIdx(ThV1, OFnm);
 	printf("Saved to %s\n", OFnm.CStr());
@@ -220,12 +225,12 @@ int main(int argc, char* argv[]){
 	TExeTm2 tm;
 //	verify();
 //	em_single();
-//	em_multi();
+	em_multi_n_known();
 //	em_multi_n_unknown();
 //	eval_efficiency();
 //	count_triangles();
 //	dist_triangles(50);
-	dist_degree(20);
+//	dist_degree(20);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }

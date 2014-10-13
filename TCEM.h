@@ -34,12 +34,9 @@ public:
 		gH(0) = N-g;
 		// init B
 		BV.Gen((W+1)*(M+1));
-		for(int j=0; j<=M; j++){
-			for (int i=j; i<=W; i++){
+		for(int j=0; j<=M; j++)
+			for (int i=j; i<=W; i++)
 				BV[Idx(i,j)] = TSpecFunc::Binomial(j, i, p);
-				IAssertR(BV[Idx(i,j)]>=0, TStr::Fmt("ER: %.6e", BV[Idx(i,j)].Val));
-			}
-		}
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
 		TRandom::InitUni(ThV);
