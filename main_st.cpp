@@ -94,6 +94,14 @@ void stat_trids(const TStr& GFNm){
 	BIO::SaveIntPrV(TridCnt, "NodeNTrids.dat");
 }
 
+int count_trids(PNEGraph& G){
+	int ntrids = 0;
+	for(PNEGraph::TObj::TNodeI NI=G->BegNI(); NI<G->EndNI(); NI++){
+		ntrids += TSnap::GetNodeTriadsAll(G, NI.GetId());
+	}
+	return ntrids/3;
+}
+
 void gen_ground_truth(const TStr& GFNm, const int W){
 	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
 	double N = G->GetNodes();
@@ -133,27 +141,25 @@ void eval_efficiency(const TStr& GFNm){
 	}
 }
 
-void verify(const TStr& GFNm, const double PEdge){
-	ExamMgr ExM(GFNm);
+void count_trids_after_sampling(ExamMgr& ExM){
 	PNEGraph G = PNEGraph::TObj::New();
-	TIntPrV TridCnt;
-	double g=0;
-	for (int i=0; i<20; i++){
-		ExM.GetSampledGraph(G, PEdge);
-		TridCnt.Clr();
-		TSnap::GetTriadParticipAll(G, TridCnt);
-		for (int j=0; j<TridCnt.Len(); j++)
-			if (TridCnt[j].Val1!=0) g+=TridCnt[j].Val2;
+	for (int i=1; i<=10; i++){
+		double pe=0.01*i;
+		ExM.GetSampledGraph(G, pe);
+		int nt = count_trids(G);
+		printf("%g:  %g\n", pe, nt/pow(pe,3));
 	}
-	printf("g = %.2f\n", g/20);
 }
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs();
-	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1.");
-	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "graph.txt", "Input graph");
+	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "../hepth/cit-HepTh.gz", "Input graph");
+	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
+	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	TExeTm2 tm;
+	ExamMgr ExM(GFNm, W, p);
+	count_trids_after_sampling(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }

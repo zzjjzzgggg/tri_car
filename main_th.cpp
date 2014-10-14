@@ -16,6 +16,7 @@
 
 using namespace std;
 
+
 void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	NSuc = 0;
 	PNEGraph G = PNEGraph::TObj::New();
@@ -35,8 +36,9 @@ void em_sub(TFltV& ThV, int& NSuc, ExamMgr& ExM){
 	printf("Experiment repeats %d times, and %d succeeded.\n", PerRpt, NSuc);
 }
 
-void em_multi(const TStr& GFNm, const int W, const double PEdge){
-	ExamMgr ExM(GFNm, W, PEdge);
+
+void em_multi(const TStr& GFNm, const int W, const double Pe){
+	ExamMgr ExM(GFNm, W, Pe);
 	TFltV ThV1(W+1), ThV2(W+1), ThV3(W+1), ThV4(W+1), ThV5(W+1);
 	int NSuc1=0, NSuc2=0, NSuc3=0, NSuc4=0, NSuc5=0;
 	std::vector<std::function<void()>> vec = {
@@ -55,16 +57,16 @@ void em_multi(const TStr& GFNm, const int W, const double PEdge){
 		ThV1[i] += (ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i]);
 		ThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	TStr OFnm = TStr::Fmt("%sth_%s_W%dK_p%g_r%d.dist", GFNm.GetFPath().CStr(), GFNm.GetFMid().CStr(),
-		W/1000, PEdge, PerRpt*vec.size());
-	BIO::SaveFltsWithIdx(ThV1, OFnm);
+	TStr OFnm = TStr::Fmt("%sth_%s_W%dK_p%g.dist", GFNm.GetFPath().CStr(), GFNm.GetFMid().CStr(), W/1000, Pe);
+	BIO::SaveFltsWithIdx(ThV1, OFnm, TStr::Fmt("Repeated: %d", PerRpt*vec.size()));
 	printf("Saved to %s\n", OFnm.CStr());
 }
+
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs();
-	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "graph.txt", "Input graph");
+	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "../hepth/cit-HepTh.gz", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	TExeTm2 tm;

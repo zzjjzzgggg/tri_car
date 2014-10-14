@@ -15,11 +15,12 @@ ExamMgr::ExamMgr(const TStr& GFnm, const int MX_TC, const double Pe) {
 	PEdge = Pe;
 }
 
-void ExamMgr::GetSampledGraph(PNEGraph& G){
+void ExamMgr::GetSampledGraph(PNEGraph& G, const double Pe){
+	const double p = Pe<0 ? PEdge : Pe;
 	TRnd rnd;
 	G->Clr();
 	for(EI ei=GFull->BegEI(); ei!=GFull->EndEI(); ei++){
-		if(rnd.GetUniDev() > PEdge) continue;
+		if(rnd.GetUniDev() > p) continue;
 		const int src = ei.GetSrcNId(), dst = ei.GetDstNId();
 		if(!G->IsNode(src)) G->AddNode(src);
 		if(!G->IsNode(dst)) G->AddNode(dst);

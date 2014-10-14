@@ -17,8 +17,8 @@ public:
 	int N, W;
 	double PEdge;
 public:
-	ExamMgr(const TStr& GFnm, const int MX_TC, const double Pe);
-	void GetSampledGraph(PNEGraph& G);
+	ExamMgr(const TStr& GFnm, const int MX_TC=1000, const double Pe=0.1);
+	void GetSampledGraph(PNEGraph& G, const double Pe=-1);
 };
 
 #endif /* EXAMMGR_H_ */

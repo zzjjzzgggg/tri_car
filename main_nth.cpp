@@ -56,9 +56,8 @@ void em_multi(const TStr& GFNm, const int W, const double PEdge){
 		ThV1[i] += (ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i]);
 		ThV1[i] /= (NSuc1 + NSuc2 + NSuc3 + NSuc4 + NSuc5);
 	}
-	TStr OFnm = TStr::Fmt("%snth_%s_p%g_r%d.dist", GFNm.GetFPath().CStr(), GFNm.GetFMid().CStr(),
-		PEdge, PerRpt*vec.size());
-	BIO::SaveFltsWithIdx(ThV1, OFnm, "# The first line denotes the estimated N");
+	TStr OFnm = TStr::Fmt("%snth_%s_p%g.dist", GFNm.GetFPath().CStr(), GFNm.GetFMid().CStr(), PEdge);
+	BIO::SaveFltsWithIdx(ThV1, OFnm, TStr::Fmt("First line is the estimated N. Repeated %d", PerRpt*vec.size()));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
