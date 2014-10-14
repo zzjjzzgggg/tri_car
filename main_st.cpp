@@ -122,18 +122,17 @@ void gen_ground_truth(const TStr& GFNm, const int W){
 	fclose(fw);
 }
 
-void eval_efficiency(const TStr& GFNm){
-	ExamMgr ExM(GFNm);
+void eval_efficiency(ExamMgr& ExM){
 	TIntPrV tridCnt;
 	TExeTm2 tm;
-	TSnap::GetTriadParticipAll(ExM.GFull, tridCnt);
-	double secs = tm.GetSecs();
-	printf("Full graph: %.2f secs.\n", secs);
+//	TSnap::GetTriadParticipAll(ExM.GFull, tridCnt);
+//	double secs = tm.GetSecs();
+//	printf("Full graph: %.2f secs.\n", secs);
 
 	PNEGraph G = PNEGraph::TObj::New();
 
-	double ps[] = {.1, .2, .3};
-	for (int i=0; i<3; i++){
+	double ps[] = {.1, .15, .2, .25, .3};
+	for (int i=0; i<5; i++){
 		ExM.GetSampledGraph(G, ps[i]);
 		tm.Tick();
 		TSnap::GetTriadParticipAll(G, tridCnt);
@@ -159,7 +158,8 @@ int main(int argc, char* argv[]){
 	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	TExeTm2 tm;
 	ExamMgr ExM(GFNm, W, p);
-	count_trids_after_sampling(ExM);
+//	count_trids_after_sampling(ExM);
+	eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
