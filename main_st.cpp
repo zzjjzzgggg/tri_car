@@ -102,14 +102,14 @@ int count_trids(PNEGraph& G){
 	return ntrids/3;
 }
 
-void gen_ground_truth(const TStr& GFNm, const int W){
+void gen_groundtruth(const TStr& GFNm){
 	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
 	double N = G->GetNodes();
 	TIntPrV tridCnt;
 	TExeTm2 tm;
 	TSnap::GetTriadParticipAll(G, tridCnt);
 	printf("time costs: %s\n", tm.GetStr());
-	TStr ofnm = TStr::Fmt("groundtruth_W%dK.dat", W/1000);
+	TStr ofnm = GFNm.GetFPath()+"groundtruth.dat";
 	FILE* fw=fopen(ofnm.CStr(), "w");
 	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
 	fprintf(fw, "# Nodes: %.0f\n", N);
@@ -157,9 +157,10 @@ int main(int argc, char* argv[]){
 	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
 	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, W, p);
+	gen_groundtruth(GFNm);
+//	ExamMgr ExM(GFNm, W, p);
 //	count_trids_after_sampling(ExM);
-	eval_efficiency(ExM);
+//	eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
