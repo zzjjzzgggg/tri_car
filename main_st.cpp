@@ -170,10 +170,10 @@ int main(int argc, char* argv[]){
 	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	TExeTm2 tm;
 //	count_trids_per_node(GFNm);
-//	gen_groundtruth(GFNm);
-	ExamMgr ExM(GFNm, W, p);
+	gen_groundtruth(GFNm);
+//	ExamMgr ExM(GFNm, W, p);
 //	count_trids_after_sampling(ExM);
-	eval_efficiency(ExM);
+//	eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
