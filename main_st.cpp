@@ -165,15 +165,20 @@ void count_trids_per_node(const TStr& GFNm){
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs();
-	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "../hepth/cit-HepTh.gz", "Input graph");
+	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
 	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
+	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
+				"\n\tc: count trids per node"
+				"\n\tg: get groundtruth"
+				"\n\te: compare efficiency");
 	TExeTm2 tm;
-//	count_trids_per_node(GFNm);
-	gen_groundtruth(GFNm);
-//	ExamMgr ExM(GFNm, W, p);
-//	count_trids_after_sampling(ExM);
-//	eval_efficiency(ExM);
+	if (Fmts.SearchCh('c') != -1) count_trids_per_node(GFNm);
+	if (Fmts.SearchCh('g') != -1) gen_groundtruth(GFNm);
+	if (Fmts.SearchCh('e') != -1){
+		ExamMgr ExM(GFNm, W, p);
+		eval_efficiency(ExM);
+	}
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
