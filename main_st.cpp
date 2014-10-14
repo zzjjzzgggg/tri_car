@@ -150,6 +150,18 @@ void count_trids_after_sampling(ExamMgr& ExM){
 	}
 }
 
+void count_trids_per_node(const TStr& GFNm){
+	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
+	int nid, ntrids;
+	TIntPrV NIdTrids;
+	for(PNEGraph::TObj::TNodeI NI=G->BegNI(); NI<G->EndNI(); NI++){
+		nid = NI.GetId();
+		ntrids = TSnap::GetNodeTriadsAll(G, nid);
+		NIdTrids.Add(TIntPr(nid, ntrids));
+	}
+	BIO::SaveIntPrV(NIdTrids, GFNm.GetFPath()+"NodeTrids.dat", "NId, NTrids");
+}
+
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs();
@@ -157,7 +169,8 @@ int main(int argc, char* argv[]){
 	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
 	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	TExeTm2 tm;
-	gen_groundtruth(GFNm);
+	count_trids_per_node(GFNm);
+//	gen_groundtruth(GFNm);
 //	ExamMgr ExM(GFNm, W, p);
 //	count_trids_after_sampling(ExM);
 //	eval_efficiency(ExM);
