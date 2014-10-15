@@ -56,7 +56,7 @@ void em_multi(ExamMgr& ExM){
 	for (int i=0; i<ThV1.Len(); i++)
 		ThV1[i] = (ThV1[i] + ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i] + ThV6[i] + ThV7[i] + ThV8[i]) / ExM.CPU;
 	const TStr OFnm = ExM.GetNTHFNm();
-	BIO::SaveFltsWithIdx(ThV1, OFnm, TStr::Fmt("First line is \hat{N}. Repeated: %d", ExM.Rpt*ExM.CPU));
+	BIO::SaveFltsWithIdx(ThV1, OFnm, TStr::Fmt("First line is N est. Repeated: %d", ExM.Rpt*ExM.CPU));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
