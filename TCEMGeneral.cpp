@@ -24,7 +24,6 @@ void TCEMGeneral::EStep(){
 		for (int i=j; i<=W; i++)
 			ZV[Idx(i,j)] = norm<1E-9 ? 0 : ZV[Idx(i,j)]/norm;
 	}
-	Assert(ZV[Idx(0,0)]>=0 && ZV[Idx(0,0)]<=1E-9);
 }
 
 /**
@@ -79,7 +78,5 @@ void TCEMGeneral::Scale(){
 		ThV[i] /= ThV[0];
 		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
 	}
-	N = g/(1-qth);
-	ThV[0] = N; // store N to ThV[0]
-//	printf("N =  %.2f, q = %.2f\n", N, qth);
+	ThV[0] = g/(1-qth);// store N to ThV[0]
 }

@@ -21,16 +21,17 @@ private:
 	TIntH gH;
 public:
 	int M;
-	double N;
 	TFltV ThV;
 public:
 	TCEMGeneral(const int W, const double Pdelta, const TIntPrV& TridCnt): W(W), Pd(Pdelta) {
 		M = g = 0;
 		for (int i=0; i<TridCnt.Len(); i++) {
 			const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
-			gH(card) = freq;
-			if (card>M) M = card;
-			if (card>0) g += freq;
+			if (card>0){
+				gH(card) = freq;
+				if (card>M) M = card;
+				g += freq;
+			}
 		}
 		// init A
 		PV.Gen((W+1)*(M+1));
