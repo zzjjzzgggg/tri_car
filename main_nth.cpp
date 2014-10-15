@@ -64,10 +64,10 @@ int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
-	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
-	const int CPU = Env.GetIfArgPrefixInt("-c:", 8, "Cores. Default 8");
-	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat. Default 12");
-	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
+	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W");
+	const int CPU = Env.GetIfArgPrefixInt("-c:", 8, "Cores to use, max=8");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
+	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm2 tm;
