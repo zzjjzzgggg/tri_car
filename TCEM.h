@@ -44,7 +44,7 @@ public:
 		// space for Z
 		ZV.Gen((W+1)*(M+1));
 	};
-	bool Run(const int max_iter = 1000);
+	bool Run(const int max_iter = 500);
 private:
 	const int Idx(const int i, const int j){ return i*M+j; }
 	void EStep();

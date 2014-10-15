@@ -7,12 +7,15 @@
 
 #include "ExamMgr.h"
 
-ExamMgr::ExamMgr(const TStr& GFnm, const int MX_TC, const double Pe) {
+ExamMgr::ExamMgr(const TStr& GFnm, const int MX_TC, const double Pe, const int NCPU, const int NRpt) {
 	// TODO Auto-generated constructor stub
+	GFNm = GFnm;
 	GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
 	N = GFull->GetNodes();
 	W = MX_TC;
 	PEdge = Pe;
+	CPU = NCPU;
+	Rpt = NRpt;
 }
 
 void ExamMgr::GetSampledGraph(PNEGraph& G, const double Pe){
