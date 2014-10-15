@@ -164,19 +164,22 @@ void count_trids_per_node(const TStr& GFNm){
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
-	Env.PrepArgs();
+	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 1000, "W. Default 1000");
-	const double p = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
+	const int CPU = Env.GetIfArgPrefixInt("-c:", 8, "Cores. Default 8");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat. Default 12");
+	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate. Default 0.1");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tc: count trids per node"
 				"\n\tg: get groundtruth"
 				"\n\te: compare efficiency");
+	if (Env.IsEndOfRun()) return 0;
 	TExeTm2 tm;
 	if (Fmts.SearchCh('c') != -1) count_trids_per_node(GFNm);
 	if (Fmts.SearchCh('g') != -1) gen_groundtruth(GFNm);
 	if (Fmts.SearchCh('e') != -1){
-		ExamMgr ExM(GFNm, W, p);
+		ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
 		eval_efficiency(ExM);
 	}
 	printf("Cost time: %s.\n", tm.GetStr());
