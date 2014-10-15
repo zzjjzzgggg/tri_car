@@ -15,11 +15,12 @@
  */
 class TCEMGeneral {
 private:
-	int W, M, g;
+	int W, g;
 	double Pd;  /// p == p_delta
 	TFltV PV, ZV, ThV_pre;
 	TIntH gH;
 public:
+	int M;
 	double N;
 	TFltV ThV;
 public:
