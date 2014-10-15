@@ -19,13 +19,13 @@ opt: CXXFLAGS += -O4
 opt: LDFLAGS += -O4
 
 # COMPILE
-main_th: main_th.cpp stdafx.h $(OBJ) 
+main_th: main_th.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 
-main_nth: main_nth.cpp stdafx.h $(OBJ) 
+main_nth: main_nth.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 	
-main_st: main_st.cpp stdafx.h $(OBJ) 
+main_st: main_st.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 
 TCEMGeneral.o: TCEMGeneral.cpp TCEMGeneral.h stdafx.h Snap.o
@@ -37,8 +37,8 @@ TCEM.o: TCEM.cpp TCEM.h stdafx.h Snap.o
 ExamMgr.o: ExamMgr.cpp ExamMgr.h stdafx.h Snap.o
 	g++ -c $(DEBUG) $(CXXFLAGS) $(LIB) $<
 
-Snap.o: 
-	g++ -c $(CXXFLAGS) $(LIB) $(SNAPDIR)/snap/Snap.cpp
+Snap.o: $(SNAPDIR)/snap/Snap.cpp
+	g++ -c $(CXXFLAGS) $(LIB) $<
 
 clean:
 	rm -f *.o main_th main_nth main_st *.Err

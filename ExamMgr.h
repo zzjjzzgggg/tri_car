@@ -23,6 +23,9 @@ public:
 	TStr GetTHFNm() const{
 		return GFNm.GetFPath() + TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge);
 	}
+	TStr GetNTHFNm() const{
+		return GFNm.GetFPath() + TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge);
+	}
 };
 
 #endif /* EXAMMGR_H_ */

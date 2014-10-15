@@ -11,7 +11,6 @@
 
 #include "stdafx.h"
 #include "TCEM.h"
-#include "TCEMGeneral.h"
 #include "ExamMgr.h"
 
 using namespace std;
