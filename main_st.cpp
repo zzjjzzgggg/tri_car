@@ -27,7 +27,7 @@ void sub_gt(const int id, Queue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 		ntrids = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, nid);
 		NIdCnt.Add(TIntPr(nid, ntrids));
 	}
-	printf("[%d] costs time: %.2f\n", id, tm.GetSecs());
+	printf("[%d] costs time: %s\n", id, tm.GetStr());
 }
 
 void multi_groundtruth(ExamMgr& ExM){
