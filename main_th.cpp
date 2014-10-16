@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
-	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat times");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	if (Env.IsEndOfRun()) return 0;
 
