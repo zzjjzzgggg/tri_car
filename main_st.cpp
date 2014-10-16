@@ -102,30 +102,27 @@ int count_trids(PNEGraph& G){
 
 /**
  * count the number of triangles in int-pair NIdCnt.
- * NIdCnt[0] = (-1, time_cost_in_seconds)
  */
 void sub_gt(ExamMgr& ExM, TIntPrV& NIdCnt){
-	TExeTm2 tm;
-	for (int i=1; i<NIdCnt.Len(); i++){
+	for (int i=0; i<NIdCnt.Len(); i++){
 		NIdCnt[i].Val2 = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, NIdCnt[i].Val1);
 	}
-	NIdCnt[0].Val2 = (int) tm.GetSecs();
 }
 
 void multi_groundtruth(ExamMgr& ExM){
+	TExeTm tm;
 	// assign jobs
 	int NdsPerCPU = ExM.N / ExM.CPU, remaining = ExM.N % ExM.CPU, B, CurB = 0;
 	TIntV Nodes;
 	ExM.GFull->GetNIdV(Nodes);
 	TIntPrV Vs[ExM.CPU];
 	for (int n=0; n<ExM.CPU; n++) {
-		Vs[n] = TIntPrV();
-		Vs[n].Add(TIntPr(-1,0));
 		if (remaining>0) {
 			B = NdsPerCPU + 1;
 			remaining --;
 		} else
 			B = NdsPerCPU;
+		Vs[n] = TIntPrV();
 		for (int i=CurB; i<CurB+B; i++) Vs[n].Add(TIntPr(Nodes[i],0));
 		CurB += B;
 	}
@@ -140,10 +137,8 @@ void multi_groundtruth(ExamMgr& ExM){
 	FILE* fw=fopen((ExM.GFNm.GetFPath()+"nodentrids.dat").CStr(), "w");
 	fprintf(fw, "# Nodes: %d\n", ExM.N);
 	TIntH TriadCntH;
-	int time_seconds=0;
 	for (int n=0; n<ExM.CPU; n++) {
-		time_seconds += Vs[n][0].Val2;
-		for (int i=1; i<Vs[n].Len(); i++) {
+		for (int i=0; i<Vs[n].Len(); i++) {
 			TriadCntH(Vs[n][i].Val2) ++;
 			fprintf(fw, "%d\t%d\n", Vs[n][i].Val1.Val, Vs[n][i].Val2.Val);
 		}
@@ -154,7 +149,7 @@ void multi_groundtruth(ExamMgr& ExM){
 	TriadCntH.GetKeyDatPrV(TriadCntV);
 	TriadCntV.Sort();
 	fw=fopen((ExM.GFNm.GetFPath()+"groundtruth.dat").CStr(), "w");
-	fprintf(fw, "# Time cost: %d seconds\n", time_seconds);
+	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
 	fprintf(fw, "# Nodes: %d\n", ExM.N);
 	for (int i=0; i<TriadCntV.Len(); i++) {
 		int card = TriadCntV[i].Val1;
