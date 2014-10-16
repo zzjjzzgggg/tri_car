@@ -72,26 +72,6 @@ void multi_groundtruth(ExamMgr& ExM){
 	fclose(fw);
 }
 
-void gen_groundtruth(const TStr& GFNm){
-	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
-	double N = G->GetNodes();
-	TIntPrV tridCnt;
-	TExeTm2 tm;
-	TSnap::GetTriadParticipAll(G, tridCnt);
-	printf("time costs: %s\n", tm.GetStr());
-	TStr ofnm = GFNm.GetFPath()+"groundtruth.dat";
-	FILE* fw=fopen(ofnm.CStr(), "w");
-	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
-	fprintf(fw, "# Nodes: %.0f\n", N);
-	for (int i=0; i<tridCnt.Len(); i++) {
-		int card = tridCnt[i].Val1;
-		int freq = tridCnt[i].Val2;
-		double prob = freq/N;
-		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
-	}
-	fclose(fw);
-}
-
 void eval_efficiency(ExamMgr& ExM){
 	TIntPrV tridCnt;
 	TExeTm2 tm;
@@ -110,16 +90,12 @@ int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
-	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
-	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
-	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
+	ExamMgr ExM(GFNm);
 	if (Fmts.SearchCh('g') != -1) multi_groundtruth(ExM);
 	if (Fmts.SearchCh('e') != -1) eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
