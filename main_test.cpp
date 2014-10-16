@@ -217,7 +217,7 @@ void add_edge(ExamMgr& ExM){
 			}
 		}
 	}
-	TSnap::SaveEdgeList(ExM.GFull, ExM.GFNm.GetFPath()+"newgraph.gz")
+	TSnap::SaveEdgeList(ExM.GFull, ExM.GFNm.GetFPath()+"newgraph.gz");
 }
 
 int main(int argc, char* argv[]){
