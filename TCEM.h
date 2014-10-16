@@ -48,7 +48,7 @@ public:
 private:
 	const int Idx(const int i, const int j){ return i*M+j; }
 	void EStep();
-	bool MStep(const double Eps=0.005);
+	bool MStep(const double Eps=0.002);
 };
 
 #endif /* TCEM_H_ */
