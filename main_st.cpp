@@ -104,11 +104,12 @@ int count_trids(PNEGraph& G){
  * count the number of triangles in int-pair NIdCnt.
  */
 void sub_gt(ExamMgr& ExM, TIntPrV& NIdCnt){
+	TExeTm2 tm;
 	printf("task len: %d\n", NIdCnt.Len());
 	for (int i=0; i<NIdCnt.Len(); i++){
 		NIdCnt[i].Val2 = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, NIdCnt[i].Val1);
 	}
-	printf("Done.\n");
+	printf("time: %s.\n", tm.GetStr());
 }
 
 void multi_groundtruth(ExamMgr& ExM){
