@@ -164,7 +164,7 @@ int main(int argc, char* argv[]){
 	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
+	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
 	PNEGraph G = PNEGraph::TObj::New();
 	ExM.GetSampledGraph(G);
 	TIntPrV TridCnt;

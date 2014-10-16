@@ -90,12 +90,13 @@ int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
+	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm);
+	ExamMgr ExM(GFNm, CPU);
 	if (Fmts.SearchCh('g') != -1) multi_groundtruth(ExM);
 	if (Fmts.SearchCh('e') != -1) eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());

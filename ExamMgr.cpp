@@ -7,7 +7,7 @@
 
 #include "ExamMgr.h"
 
-ExamMgr::ExamMgr(const TStr& GFnm, const int MX_TC, const double Pe, const int NCPU, const int NRpt) {
+ExamMgr::ExamMgr(const TStr& GFnm, const int NCPU, const int MX_TC, const double Pe, const int NRpt) {
 	// TODO Auto-generated constructor stub
 	GFNm = GFnm;
 	GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
