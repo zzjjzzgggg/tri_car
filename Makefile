@@ -22,7 +22,7 @@ th: main_th.cpp $(OBJ)
 nth: main_nth.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 	
-st: main_st.cpp $(OBJ) 
+st: main_st.cpp Queue.h $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 
 test: main_test.cpp $(OBJ) 

@@ -5,134 +5,42 @@
  *      Author: jzzhao
  */
 
-#include <thread>
+#include <queue>
 #include <mutex>
+#include <condition_variable>
 #include <vector>
+#include <thread>
 
 #include "stdafx.h"
+#include "Queue.h"
 #include "ExamMgr.h"
 
 using namespace std;
 
 /**
- * count triangles per week
- */
-void count_triangles(){
-	PNEGraph G = PNEGraph::TObj::New();
-	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
-	int pre_week = 0, ntrid = 0;
-	TIntPrV TridCnt; TIntV NTridsPerWeek;
-	TSsParser Ss(Root+"enron_add_week_no.gz");
-	while(Ss.Next()){
-		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
-		if(week!=pre_week && G->GetEdges()!=0) {
-			TSnap::GetTriadParticipAll(G, TridCnt);
-			for (int i=0; i<TridCnt.Len(); i++) ntrid += TridCnt[i].Val1*TridCnt[i].Val2;
-			NTridsPerWeek.Add(ntrid/3);
-			G->Clr(); TridCnt.Clr(); pre_week = week; ntrid = 0;
-		}
-		if (!G->IsNode(fid)) G->AddNode(fid);
-		if (!G->IsNode(tid)) G->AddNode(tid);
-		G->AddEdge(fid, tid);
-	}
-	BIO::SaveIntsWithIdx(NTridsPerWeek, Root+"NTridsPerWeek.dat");
-}
-
-/**
- * triadic cardinality distribution
- */
-void dist_triangles(const int WK){
-	PNEGraph G = PNEGraph::TObj::New();
-	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
-	TSsParser Ss(Root+"enron_add_week_no.gz");
-	while(Ss.Next()){
-		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
-		if(week==WK) {
-			if (!G->IsNode(fid)) G->AddNode(fid);
-			if (!G->IsNode(tid)) G->AddNode(tid);
-			G->AddEdge(fid, tid);
-		}else if(week>WK) break;
-	}
-	TIntPrV TridCnt;
-	TSnap::GetTriadParticipAll(G, TridCnt);
-	int ntrid =0;
-	for (int i=0; i<TridCnt.Len(); i++) ntrid += TridCnt[i].Val1*TridCnt[i].Val2;
-	ntrid /= 3;
-	BIO::SaveIntPrV(TridCnt, Root+TStr::Fmt("TridCnt_%d.dat", WK));
-}
-
-/**
- * degree distribution
- */
-void dist_degree(const int WK){
-	PNEGraph G = PNEGraph::TObj::New();
-	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
-	TSsParser Ss(Root+"enron_add_week_no.gz");
-	while(Ss.Next()){
-		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
-		if(week==WK) {
-			if (!G->IsNode(fid)) G->AddNode(fid);
-			if (!G->IsNode(tid)) G->AddNode(tid);
-			G->AddEdge(fid, tid);
-		}else if(week>WK) break;
-	}
-	TIntPrV DegV;
-	TSnap::GetDegCnt<PNEGraph>(G, DegV);
-	BIO::SaveIntPrV(DegV, Root+TStr::Fmt("DegCnt_%d.dat", WK));
-}
-
-void stat_trids(const TStr& GFNm){
-	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
-	TIntPrV TridCnt;
-	for(PNEGraph::TObj::TNodeI NI=G->BegNI(); NI<G->EndNI(); NI++){
-		int nid = NI.GetId();
-		int ntrids = TSnap::GetNodeTriadsAll(G, nid);
-		TridCnt.Add(TIntPr(nid, ntrids));
-	}
-	BIO::SaveIntPrV(TridCnt, "NodeNTrids.dat");
-}
-
-int count_trids(PNEGraph& G){
-	int ntrids = 0;
-	for(PNEGraph::TObj::TNodeI NI=G->BegNI(); NI<G->EndNI(); NI++){
-		ntrids += TSnap::GetNodeTriadsAll(G, NI.GetId());
-	}
-	return ntrids/3;
-}
-
-/**
  * count the number of triangles in int-pair NIdCnt.
  */
-void sub_gt(ExamMgr& ExM, TIntPrV& NIdCnt){
+void sub_gt(const int id, Queue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 	TExeTm2 tm;
-	printf("task len: %d\n", NIdCnt.Len());
-	for (int i=0; i<NIdCnt.Len(); i++){
-		NIdCnt[i].Val2 = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, NIdCnt[i].Val1);
+	int nid, ntrids;
+	while (Que.TryPop(nid)) {
+		ntrids = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, nid);
+		NIdCnt.Add(TIntPr(nid, ntrids));
 	}
-	printf("time: %s.\n", tm.GetStr());
+	printf("[%d] costs time: %.2f\n", id, tm.GetSecs());
 }
 
 void multi_groundtruth(ExamMgr& ExM){
 	TExeTm tm;
 	// assign jobs
-	int NdsPerCPU = ExM.N / ExM.CPU, remaining = ExM.N % ExM.CPU, B, CurB = 0;
-	TIntV Nodes;
-	ExM.GFull->GetNIdV(Nodes);
+	Queue<int> Qu;
+	for (ExamMgr::NI NI=ExM.GFull->BegNI(); NI<ExM.GFull->EndNI(); NI++) Qu.Push(NI.GetId());
 	TIntPrV Vs[ExM.CPU];
-	for (int n=0; n<ExM.CPU; n++) {
-		if (remaining>0) {
-			B = NdsPerCPU + 1;
-			remaining --;
-		} else
-			B = NdsPerCPU;
-		Vs[n] = TIntPrV();
-		for (int i=CurB; i<CurB+B; i++) Vs[n].Add(TIntPr(Nodes[i],0));
-		CurB += B;
-	}
+	for (int n=0; n<ExM.CPU; n++) Vs[n] = TIntPrV();
 
 	// assign threads
 	std::vector<std::thread> threads;
-	for (int n=0; n<ExM.CPU; n++) threads.emplace_back([n, &ExM, &Vs] { sub_gt(ExM, Vs[n]); });
+	for (int n=0; n<ExM.CPU; n++) threads.emplace_back([n, &Qu, &ExM, &Vs] { sub_gt(n, Qu, ExM, Vs[n]); });
 	for(std::thread& t: threads) t.join();
 
 	// collect results
@@ -186,12 +94,7 @@ void gen_groundtruth(const TStr& GFNm){
 void eval_efficiency(ExamMgr& ExM){
 	TIntPrV tridCnt;
 	TExeTm2 tm;
-//	TSnap::GetTriadParticipAll(ExM.GFull, tridCnt);
-//	double secs = tm.GetSecs();
-//	printf("Full graph: %.2f secs.\n", secs);
-
 	PNEGraph G = PNEGraph::TObj::New();
-
 	double ps[] = {.1, .15, .2, .25, .3};
 	for (int i=0; i<5; i++){
 		ExM.GetSampledGraph(G, ps[i]);
@@ -201,27 +104,6 @@ void eval_efficiency(ExamMgr& ExM){
 	}
 }
 
-void count_trids_after_sampling(ExamMgr& ExM){
-	PNEGraph G = PNEGraph::TObj::New();
-	for (int i=1; i<=10; i++){
-		double pe=0.01*i;
-		ExM.GetSampledGraph(G, pe);
-		int nt = count_trids(G);
-		printf("%g:  %g\n", pe, nt/pow(pe,3));
-	}
-}
-
-void count_trids_per_node(const TStr& GFNm){
-	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
-	int nid, ntrids;
-	TIntPrV NIdTrids;
-	for(PNEGraph::TObj::TNodeI NI=G->BegNI(); NI<G->EndNI(); NI++){
-		nid = NI.GetId();
-		ntrids = TSnap::GetNodeTriadsAll(G, nid);
-		NIdTrids.Add(TIntPr(nid, ntrids));
-	}
-	BIO::SaveIntPrV(NIdTrids, GFNm.GetFPath()+"NodeTrids.dat", "NId, NTrids");
-}
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);

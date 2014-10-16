@@ -13,6 +13,7 @@
 class ExamMgr {
 public:
 	typedef PNEGraph::TObj::TEdgeI EI;
+	typedef PNEGraph::TObj::TNodeI NI;
 	TStr GFNm;
 	PNEGraph GFull;
 	int N, W, CPU, Rpt;
