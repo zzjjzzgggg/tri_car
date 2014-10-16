@@ -24,6 +24,7 @@ using namespace std;
 void sub_gt(const int id, Queue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 	TExeTm2 tm;
 	int nid, ntrids;
+	printf("Thread [%d] is ready.\n", id);
 	while (Que.TryPop(nid)) {
 		ntrids = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, nid);
 		NIdCnt.Add(TIntPr(nid, ntrids));
