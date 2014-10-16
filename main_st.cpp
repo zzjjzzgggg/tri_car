@@ -237,7 +237,7 @@ int main(int argc, char* argv[]){
 				"\n\tg: get groundtruth"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
-	TExeTm tm;
+	TExeTm2 tm;
 	ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
 	if (Fmts.SearchCh('g') != -1) multi_groundtruth(ExM);
 	if (Fmts.SearchCh('e') != -1) eval_efficiency(ExM);
