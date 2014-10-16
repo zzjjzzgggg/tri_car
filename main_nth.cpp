@@ -36,27 +36,21 @@ void em_sub(ExamMgr& ExM, TFltV& ThV){
 }
 
 void em_multi(ExamMgr& ExM){
-	TFltV ThV1(ExM.W+1), ThV2(ExM.W+1), ThV3(ExM.W+1), ThV4(ExM.W+1),
-			ThV5(ExM.W+1), ThV6(ExM.W+1), ThV7(ExM.W+1), ThV8(ExM.W+1);
-	std::vector<std::function<void()>> Tasks = {
-		[&ExM, &ThV1] { em_sub(ExM, ThV1); },
-		[&ExM, &ThV2] { em_sub(ExM, ThV2); },
-		[&ExM, &ThV3] { em_sub(ExM, ThV3); },
-		[&ExM, &ThV4] { em_sub(ExM, ThV4); },
-		[&ExM, &ThV5] { em_sub(ExM, ThV5); },
-		[&ExM, &ThV6] { em_sub(ExM, ThV6); },
-		[&ExM, &ThV7] { em_sub(ExM, ThV7); },
-		[&ExM, &ThV8] { em_sub(ExM, ThV8); },
-	};
+	TFltV ThVs[ExM.CPU];
+	for (int i=0; i<ExM.CPU; i++) ThVs[i] = TFltV(ExM.W+1);
+
 	std::vector<std::thread> threads;
-	for (int i=0; i<ExM.CPU; i++) threads.emplace_back(Tasks[i]);
+	for (int i=0; i<ExM.CPU; i++) threads.emplace_back([i, &ExM, &ThVs] { em_sub(ExM, ThVs[i]); });
 	for(std::thread& t: threads) t.join();
 
+	for (int i=0; i<=ExM.W; i++){
+		for (int n=1; n<ExM.CPU; n++) ThVs[0][i] += ThVs[n][i];
+		ThVs[0][i] /= ExM.CPU;
+	}
+
 	printf("Saving...\n");
-	for (int i=0; i<ThV1.Len(); i++)
-		ThV1[i] = (ThV1[i] + ThV2[i] + ThV3[i] + ThV4[i] + ThV5[i] + ThV6[i] + ThV7[i] + ThV8[i]) / ExM.CPU;
 	const TStr OFnm = ExM.GetNTHFNm();
-	BIO::SaveFltsWithIdx(ThV1, OFnm, TStr::Fmt("First line is N est. Repeated: %d", ExM.Rpt*ExM.CPU));
+	BIO::SaveFltsWithIdx(ThVs[0], OFnm, TStr::Fmt("First line is N est. Repeated: %d", ExM.Rpt*ExM.CPU));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 

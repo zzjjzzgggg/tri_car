@@ -5,6 +5,10 @@
  *      Author: jzzhao
  */
 
+#include <thread>
+#include <mutex>
+#include <vector>
+
 #include "stdafx.h"
 #include "ExamMgr.h"
 
@@ -96,6 +100,71 @@ int count_trids(PNEGraph& G){
 	return ntrids/3;
 }
 
+/**
+ * count the number of triangles in int-pair NIdCnt.
+ * NIdCnt[0] = (-1, time_cost_in_seconds)
+ */
+void sub_gt(ExamMgr& ExM, TIntPrV& NIdCnt){
+	TExeTm2 tm;
+	for (int i=1; i<NIdCnt.Len(); i++){
+		NIdCnt[i].Val2 = TSnap::GetNodeTriadsAll<PNEGraph>(ExM.GFull, NIdCnt[i].Val1);
+	}
+	NIdCnt[0].Val2 = (int) tm.GetSecs();
+}
+
+void multi_groundtruth(ExamMgr& ExM){
+	// assign jobs
+	int NdsPerCPU = ExM.N / ExM.CPU, remaining = ExM.N % ExM.CPU, B, CurB = 0;
+	TIntV Nodes;
+	ExM.GFull->GetNIdV(Nodes);
+	TIntPrV Vs[ExM.CPU];
+	for (int n=0; n<ExM.CPU; n++) {
+		Vs[n] = TIntPrV();
+		Vs[n].Add(TIntPr(-1,0));
+		if (remaining>0) {
+			B = NdsPerCPU + 1;
+			remaining --;
+		} else
+			B = NdsPerCPU;
+		for (int i=CurB; i<CurB+B; i++) Vs[n].Add(TIntPr(Nodes[i],0));
+		CurB += B;
+	}
+
+	// assign threads
+	std::vector<std::thread> threads;
+	for (int n=0; n<ExM.CPU; n++) threads.emplace_back([n, &ExM, &Vs] { sub_gt(ExM, Vs[n]); });
+	for(std::thread& t: threads) t.join();
+
+	// collect results
+	printf("Saving...\n");
+	FILE* fw=fopen((ExM.GFNm.GetFPath()+"nodentrids.dat").CStr(), "w");
+	fprintf(fw, "# Nodes: %d\n", ExM.N);
+	TIntH TriadCntH;
+	int time_seconds=0;
+	for (int n=0; n<ExM.CPU; n++) {
+		time_seconds += Vs[n][0].Val2;
+		for (int i=1; i<Vs[n].Len(); i++) {
+			TriadCntH(Vs[n][i].Val2) ++;
+			fprintf(fw, "%d\t%d\n", Vs[n][i].Val1.Val, Vs[n][i].Val2.Val);
+		}
+	}
+	fclose(fw);
+
+	TIntPrV TriadCntV;
+	TriadCntH.GetKeyDatPrV(TriadCntV);
+	TriadCntV.Sort();
+	fw=fopen((ExM.GFNm.GetFPath()+"groundtruth.dat").CStr(), "w");
+	fprintf(fw, "# Time cost: %d seconds\n", time_seconds);
+	fprintf(fw, "# Nodes: %d\n", ExM.N);
+	for (int i=0; i<TriadCntV.Len(); i++) {
+		int card = TriadCntV[i].Val1;
+		int freq = TriadCntV[i].Val2;
+		double prob = freq/(double)ExM.N;
+		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
+	}
+	fclose(fw);
+}
+
 void gen_groundtruth(const TStr& GFNm){
 	PNEGraph G = TSnap::LoadEdgeList<PNEGraph>(GFNm);
 	double N = G->GetNodes();
@@ -165,17 +234,13 @@ int main(int argc, char* argv[]){
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
-				"\n\tc: count trids per node"
 				"\n\tg: get groundtruth"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
-	TExeTm2 tm;
-	if (Fmts.SearchCh('c') != -1) count_trids_per_node(GFNm);
-	if (Fmts.SearchCh('g') != -1) gen_groundtruth(GFNm);
-	if (Fmts.SearchCh('e') != -1){
-		ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
-		eval_efficiency(ExM);
-	}
+	TExeTm tm;
+	ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
+	if (Fmts.SearchCh('g') != -1) multi_groundtruth(ExM);
+	if (Fmts.SearchCh('e') != -1) eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
