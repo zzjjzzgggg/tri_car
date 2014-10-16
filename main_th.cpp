@@ -16,7 +16,7 @@
 using namespace std;
 
 
-void em_sub(ExamMgr& ExM, TFltV& ThV){
+void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 	PNEGraph G = PNEGraph::TObj::New();
 	TIntPrV TridCnt;
 	int NSuc = 0;
@@ -26,14 +26,14 @@ void em_sub(ExamMgr& ExM, TFltV& ThV){
 		TridCnt.Clr();
 		TSnap::GetTriadParticipAll(G, TridCnt);
 		TCEM EM(ExM.W, ExM.N, pow(ExM.PEdge, 3), TridCnt);
-		printf("Sampled: nodes: %d, edges: %d, M: %d\n", G->GetNodes(), G->GetEdges(), EM.M);
+		printf("[%d] Sampled: nodes: %d, edges: %d, M: %d\n", id, G->GetNodes(), G->GetEdges(), EM.M);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
 	}
 	for (int i=0; i<ThV.Len(); i++) ThV[i] /= NSuc;
-	printf("Experiment repeats %d times, and %d succeeded.\n", ExM.Rpt, NSuc);
+	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);
 }
 
 
@@ -42,7 +42,7 @@ void em_multi(ExamMgr& ExM){
 	for (int i=0; i<ExM.CPU; i++) ThVs[i] = TFltV(ExM.W+1);
 
 	std::vector<std::thread> threads;
-	for (int i=0; i<ExM.CPU; i++) threads.emplace_back([i, &ExM, &ThVs] { em_sub(ExM, ThVs[i]); });
+	for (int i=0; i<ExM.CPU; i++) threads.emplace_back([i, &ExM, &ThVs] { em_sub(i, ExM, ThVs[i]); });
 	for(std::thread& t: threads) t.join();
 
 	for (int i=0; i<=ExM.W; i++){
