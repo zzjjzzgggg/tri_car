@@ -153,6 +153,73 @@ void count_trids_per_node(const TStr& GFNm){
 	BIO::SaveIntPrV(NIdTrids, GFNm.GetFPath()+"NodeTrids.dat", "NId, NTrids");
 }
 
+void verify(ExamMgr& ExM){
+	PNEGraph G = PNEGraph::TObj::New();
+	ExM.GetSampledGraph(G);
+	TIntPrV TridCnt;
+	TSnap::GetTriadParticipAll(G, TridCnt);
+	int g = 0;
+	for (int i=0; i<TridCnt.Len(); i++) {
+		if (TridCnt[i].Val1 > 0) g += TridCnt[i].Val2;
+	}
+	printf("g: %d\n", g);
+
+	TIntPrV CarFreq;
+	BIO::LoadIntPrVec(ExM.GFNm.GetFPath()+"groundtruth.dat", CarFreq);
+	TIntFltPrV Th;
+	double norm = ExM.N - CarFreq[0].Val2;
+	for (int i=1; i<CarFreq.Len(); i++){
+		const int card = CarFreq[i].Val1, freq = CarFreq[i].Val2;
+		Th.Add(TIntFltPr(card, freq/norm));
+	}
+
+	TIntFltPrV Th_hat;
+	BIO::LoadIntFltPrVec(ExM.GetNTHFNm(), Th_hat);
+
+	double qth=0;
+	for (int i=0; i<Th.Len(); i++){
+		qth += Th[i].Val2*TSpecFunc::Binomial(0, Th[i].Val1, pow(ExM.PEdge,3));
+	}
+	printf("q_th: %.6f\n", qth);
+
+	double qth_hat=0;
+	for (int i=1; i<Th_hat.Len(); i++){
+		qth_hat += Th_hat[i].Val2*TSpecFunc::Binomial(0, Th_hat[i].Val1, pow(ExM.PEdge,3));
+	}
+	printf("q_th_hat: %.6f\n", qth_hat);
+
+	double nest = g / (1-qth);
+	printf("N est: %.2f (%.0f)\n", nest/norm, norm);
+
+	double nest_hat = g / (1-qth_hat);
+	printf("N est: %.2f (%.0f)\n", nest_hat/norm, norm);
+
+}
+
+void add_edge(ExamMgr& ExM){
+	TIntPrV NodeTriads;
+	BIO::LoadIntPrVec(ExM.GFNm.GetFPath()+"nodentrids.dat", NodeTriads);
+	TIntV NoNds;
+	for (int i=0; i<NodeTriads.Len(); i++){
+		if (NodeTriads[i].Val2==0) NoNds.Add(NodeTriads[i].Val1);
+	}
+	NoNds.Shuffle(TInt::Rnd);
+	for (int i=0; i<2000; i++){
+		int id1 = NoNds[i];
+		PNEGraph::TObj::TNodeI ni = ExM.GFull->GetNI(id1);
+		int com = ni.GetNbhNId(0);
+		ni = ExM.GFull->GetNI(com);
+		for (int d=0; d<ni.GetDeg(); d++){
+			int id2=ni.GetNbhNId(d);
+			if (ExM.GFull->GetNI(id2).GetDeg()==1) {
+				ExM.GFull->AddEdge(id1, id2);
+				break;
+			}
+		}
+	}
+	TSnap::SaveEdgeList(ExM.GFull, ExM.GFNm.GetFPath()+"newgraph.gz")
+}
+
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
@@ -165,46 +232,7 @@ int main(int argc, char* argv[]){
 
 	TExeTm2 tm;
 	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-	PNEGraph G = PNEGraph::TObj::New();
-	ExM.GetSampledGraph(G);
-	TIntPrV TridCnt;
-	TSnap::GetTriadParticipAll(G, TridCnt);
-	int g = 0;
-	for (int i=0; i<TridCnt.Len(); i++) {
-		if (TridCnt[i].Val1 > 0) g += TridCnt[i].Val2;
-	}
-	printf("g: %d\n", g);
-
-	TIntPrV CarFreq;
-	BIO::LoadIntPrVec(GFNm.GetFPath()+"groundtruth.dat", CarFreq);
-	TIntFltPrV Th;
-	double norm = ExM.N - CarFreq[0].Val2;
-	for (int i=1; i<CarFreq.Len(); i++){
-		const int card = CarFreq[i].Val1, freq = CarFreq[i].Val2;
-		Th.Add(TIntFltPr(card, freq/norm));
-	}
-
-	TIntFltPrV Th_hat;
-	BIO::LoadIntFltPrVec(GFNm.GetFPath()+ExM.GetNTHFNm(), Th_hat);
-
-	double qth=0;
-	for (int i=0; i<Th.Len(); i++){
-		qth += Th[i].Val2*TSpecFunc::Binomial(0, Th[i].Val1, pow(Pe,3));
-	}
-	printf("q_th: %.6f\n", qth);
-
-	double qth_hat=0;
-	for (int i=1; i<Th_hat.Len(); i++){
-		qth_hat += Th_hat[i].Val2*TSpecFunc::Binomial(0, Th_hat[i].Val1, pow(Pe,3));
-	}
-	printf("q_th_hat: %.6f\n", qth_hat);
-
-	double nest = g / (1-qth);
-	printf("N est: %.2f (%.0f)\n", nest/norm, norm);
-
-	double nest_hat = g / (1-qth_hat);
-	printf("N est: %.2f (%.0f)\n", nest_hat/norm, norm);
-
+	add_edge(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
