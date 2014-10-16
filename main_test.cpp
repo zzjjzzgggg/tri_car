@@ -4,11 +4,8 @@
  *  Created on: Sep 18, 2014
  *      Author: jzzhao
  */
-
 #include "stdafx.h"
 #include "ExamMgr.h"
-
-using namespace std;
 
 /**
  * count triangles per week
@@ -164,18 +161,50 @@ int main(int argc, char* argv[]){
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
-	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
-				"\n\tc: count trids per node"
-				"\n\tg: get groundtruth"
-				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
+
 	TExeTm2 tm;
-	if (Fmts.SearchCh('c') != -1) count_trids_per_node(GFNm);
-	if (Fmts.SearchCh('g') != -1) gen_groundtruth(GFNm);
-	if (Fmts.SearchCh('e') != -1){
-		ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
-		eval_efficiency(ExM);
+	ExamMgr ExM(GFNm, W, Pe, CPU, Rpt);
+	PNEGraph G = PNEGraph::TObj::New();
+	ExM.GetSampledGraph(G);
+	TIntPrV TridCnt;
+	TSnap::GetTriadParticipAll(G, TridCnt);
+	int g = 0;
+	for (int i=0; i<TridCnt.Len(); i++) {
+		if (TridCnt[i].Val1 > 0) g += TridCnt[i].Val2;
 	}
+	printf("g: %d\n", g);
+
+	TIntPrV CarFreq;
+	BIO::LoadIntPrVec(GFNm.GetFPath()+"groundtruth.dat", CarFreq);
+	TIntFltPrV Th;
+	double norm = ExM.N - CarFreq[0].Val2;
+	for (int i=1; i<CarFreq.Len(); i++){
+		const int card = CarFreq[i].Val1, freq = CarFreq[i].Val2;
+		Th.Add(TIntFltPr(card, freq/norm));
+	}
+
+	TIntFltPrV Th_hat;
+	BIO::LoadIntFltPrVec(GFNm.GetFPath()+ExM.GetNTHFNm(), Th_hat);
+
+	double qth=0;
+	for (int i=0; i<Th.Len(); i++){
+		qth += Th[i].Val2*TSpecFunc::Binomial(0, Th[i].Val1, pow(Pe,3));
+	}
+	printf("q_th: %.6f\n", qth);
+
+	double qth_hat=0;
+	for (int i=1; i<Th_hat.Len(); i++){
+		qth_hat += Th_hat[i].Val2*TSpecFunc::Binomial(0, Th_hat[i].Val1, pow(Pe,3));
+	}
+	printf("q_th_hat: %.6f\n", qth_hat);
+
+	double nest = g / (1-qth);
+	printf("N est: %.2f (%.0f)\n", nest/norm, norm);
+
+	double nest_hat = g / (1-qth_hat);
+	printf("N est: %.2f (%.0f)\n", nest_hat/norm, norm);
+
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
