@@ -7,7 +7,7 @@ CXXFLAGS += -Wall -std=c++11
 LDFLAGS += -lrt -pthread -std=c++11
 
 SNAPDIR = /home/jzzhao/git_project/netsnap
-LIB = -I $(SNAPDIR)/glib -I $(SNAPDIR)/snap
+LIB = -I $(SNAPDIR)/glib -I $(SNAPDIR)/snap 
 OBJ = Snap.o TCEM.o ExamMgr.o TCEMGeneral.o
 
 all: th
@@ -22,8 +22,8 @@ th: main_th.cpp $(OBJ)
 nth: main_nth.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 	
-st: main_st.cpp Queue.h $(OBJ) 
-	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
+st: main_st.cpp $(OBJ) Queue.h
+	g++ $(DEBUG) $(OBJ)  $(LDFLAGS) $(LIB) -o $@ $<
 
 test: main_test.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<

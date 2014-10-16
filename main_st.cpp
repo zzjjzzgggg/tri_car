@@ -11,11 +11,12 @@
 #include <vector>
 #include <thread>
 
+using namespace std;
+
 #include "stdafx.h"
 #include "Queue.h"
 #include "ExamMgr.h"
 
-using namespace std;
 
 /**
  * count the number of triangles in int-pair NIdCnt.
