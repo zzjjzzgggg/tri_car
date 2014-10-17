@@ -29,7 +29,7 @@ public:
 			const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
 			if (card>0){
 				gH(card) = freq;
-				if (card>M) M = card;
+				if (card > M) M = card;
 				g += freq;
 			}
 		}

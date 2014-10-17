@@ -47,13 +47,13 @@ void multi_groundtruth(ExamMgr& ExM){
 
 	// collect results
 	printf("Saving...\n");
-	TZipOut tz = TZipOut::New(ExM.GetNTFNm());
-	tz.PutStrLn(TStr::Fmt("# Nodes: %d", ExM.N));
+	PSOut tz = TZipOut::New(ExM.GetNTFNm());
+	tz->PutStrLn(TStr::Fmt("# Nodes: %d", ExM.N));
 	TIntH TriadCntH;
 	for (int n=0; n<ExM.CPU; n++) {
 		for (int i=0; i<Vs[n].Len(); i++) {
 			TriadCntH(Vs[n][i].Val2) ++;
-			tz.PutStrLn(TStr::Fmt("%d\t%d", Vs[n][i].Val1.Val, Vs[n][i].Val2.Val));
+			tz->PutStrLn(TStr::Fmt("%d\t%d", Vs[n][i].Val1.Val, Vs[n][i].Val2.Val));
 		}
 	}
 
@@ -74,14 +74,14 @@ void multi_groundtruth(ExamMgr& ExM){
 
 void eval_efficiency(ExamMgr& ExM){
 	TIntPrV tridCnt;
-	TExeTm2 tm;
+	TExeTm tm;
 	PNEGraph G = PNEGraph::TObj::New();
 	double ps[] = {.1, .15, .2, .25, .3};
 	for (int i=0; i<5; i++){
 		ExM.GetSampledGraph(G, ps[i]);
 		tm.Tick();
-		TSnap::GetTriadParticipAll(G, tridCnt);
-		printf("PEdge = %g: %.2f secs.\n", ps[i], tm.GetSecs());
+		for (int k=0; k<ExM.Rpt; k++) TSnap::GetTriadParticipAll(G, tridCnt);
+		printf("PEdge = %g: %.2f secs.\n", ps[i], tm.GetSecs()/ExM.Rpt);
 	}
 }
 
@@ -91,12 +91,15 @@ int main(int argc, char* argv[]){
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
+	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
+	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, CPU);
+	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
 	if (Fmts.SearchCh('g') != -1) multi_groundtruth(ExM);
 	if (Fmts.SearchCh('e') != -1) eval_efficiency(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
