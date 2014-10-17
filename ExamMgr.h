@@ -27,6 +27,12 @@ public:
 	TStr GetNTHFNm() const{
 		return GFNm.GetFPath() + TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge);
 	}
+	TStr GetGTFNm() const {
+		return GFNm.GetFPath() + TStr::Fmt("gndtruth_%s.dat", GFNm.GetFMid().CStr());
+	}
+	TStr GetNTFNm() const {
+		return GFNm.GetFPath() + TStr::Fmt("ndtriads_%s.dat", GFNm.GetFMid().CStr());
+	}
 };
 
 #endif /* EXAMMGR_H_ */

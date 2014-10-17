@@ -47,7 +47,7 @@ void multi_groundtruth(ExamMgr& ExM){
 
 	// collect results
 	printf("Saving...\n");
-	FILE* fw=fopen((ExM.GFNm.GetFPath()+"nodentrids.dat").CStr(), "w");
+	FILE* fw=fopen(ExM.GetNTFNm().CStr(), "w");
 	fprintf(fw, "# Nodes: %d\n", ExM.N);
 	TIntH TriadCntH;
 	for (int n=0; n<ExM.CPU; n++) {
@@ -61,7 +61,7 @@ void multi_groundtruth(ExamMgr& ExM){
 	TIntPrV TriadCntV;
 	TriadCntH.GetKeyDatPrV(TriadCntV);
 	TriadCntV.Sort();
-	fw=fopen((ExM.GFNm.GetFPath()+"groundtruth.dat").CStr(), "w");
+	fw=fopen(ExM.GetGTFNm().CStr(), "w");
 	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
 	fprintf(fw, "# Nodes: %d\n", ExM.N);
 	for (int i=0; i<TriadCntV.Len(); i++) {
