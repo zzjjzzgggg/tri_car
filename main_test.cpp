@@ -200,6 +200,14 @@ void verify(ExamMgr& ExM){
 	}
 	nest_hat2 *= g;
 	printf("[2] N est: %.6f\n", nest_hat2/norm);
+
+	BIO::LoadFlts(ExM.GFNm.GetFPath()+"nthp_mention-higgs_W1K_p0.1.dist", Th_hat, 1);
+	double nest_hat3=0;
+	for (int i=1; i<Th_hat.Len(); i++){
+		nest_hat3 += Th_hat[i];
+	}
+	nest_hat3 *= g;
+	printf("[3] N est: %.6f\n", nest_hat3/norm);
 }
 
 void add_edge(ExamMgr& ExM){

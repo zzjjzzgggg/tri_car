@@ -73,12 +73,11 @@ void TCEMGeneral::Scale(){
 		ThV[i] /= (1 - TSpecFunc::Binomial(0, i, Pd));
 		ThV[0] += ThV[i];
 	}
-	/*
-	double qth = 0; // q_theta
+	//double qth = 0; // q_theta
 	for (int i=1; i<=W; i++) {
 		ThV[i] /= ThV[0];
-		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
+		//qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
 	}
-	ThV[0] = g/(1-qth);// store N to ThV[0]
-	*/
+	//ThV[0] = g/(1-qth);// store N to ThV[0]
+	ThV[0] *= g;
 }
