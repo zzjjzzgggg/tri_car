@@ -165,7 +165,7 @@ void verify(ExamMgr& ExM){
 	printf("g: %d\n", g);
 
 	TIntPrV CarFreq;
-	BIO::LoadIntPrVec(ExM.GFNm.GetFPath()+"groundtruth.dat", CarFreq);
+	BIO::LoadIntPrVec(ExM.GetGTFNm(), CarFreq);
 	TIntFltPrV Th;
 	double norm = ExM.N - CarFreq[0].Val2;
 	for (int i=1; i<CarFreq.Len(); i++){
@@ -173,8 +173,8 @@ void verify(ExamMgr& ExM){
 		Th.Add(TIntFltPr(card, freq/norm));
 	}
 
-	TIntFltPrV Th_hat;
-	BIO::LoadIntFltPrVec(ExM.GetNTHFNm(), Th_hat);
+	TFltV Th_hat;
+	BIO::LoadFlts(ExM.GetNTHFNm(), Th_hat, 1);
 
 	double qth=0;
 	for (int i=0; i<Th.Len(); i++){
@@ -184,16 +184,22 @@ void verify(ExamMgr& ExM){
 
 	double qth_hat=0;
 	for (int i=1; i<Th_hat.Len(); i++){
-		qth_hat += Th_hat[i].Val2*TSpecFunc::Binomial(0, Th_hat[i].Val1, pow(ExM.PEdge,3));
+		qth_hat += Th_hat[i]*TSpecFunc::Binomial(0, i, pow(ExM.PEdge,3));
 	}
 	printf("q_th_hat: %.6f\n", qth_hat);
 
 	double nest = g / (1-qth);
-	printf("N est: %.2f (%.0f)\n", nest/norm, norm);
+	printf("N est: %.6f (%.0f)\n", nest/norm, norm);
 
 	double nest_hat = g / (1-qth_hat);
-	printf("N est: %.2f (%.0f)\n", nest_hat/norm, norm);
+	printf("[1] N est: %.6f\n", nest_hat/norm);
 
+	double nest_hat2=0;
+	for (int i=1; i<Th_hat.Len(); i++){
+		nest_hat2 += Th_hat[i]/(1-TSpecFunc::Binomial(0, i, pow(ExM.PEdge,3)));
+	}
+	nest_hat2 *= g;
+	printf("[2] N est: %.6f\n", nest_hat2/norm);
 }
 
 void add_edge(ExamMgr& ExM){
@@ -232,7 +238,7 @@ int main(int argc, char* argv[]){
 
 	TExeTm2 tm;
 	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-	add_edge(ExM);
+	verify(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
