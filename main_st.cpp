@@ -47,21 +47,20 @@ void multi_groundtruth(ExamMgr& ExM){
 
 	// collect results
 	printf("Saving...\n");
-	FILE* fw=fopen(ExM.GetNTFNm().CStr(), "w");
-	fprintf(fw, "# Nodes: %d\n", ExM.N);
+	TZipOut tz = TZipOut::New(ExM.GetNTFNm());
+	tz.PutStrLn(TStr::Fmt("# Nodes: %d", ExM.N));
 	TIntH TriadCntH;
 	for (int n=0; n<ExM.CPU; n++) {
 		for (int i=0; i<Vs[n].Len(); i++) {
 			TriadCntH(Vs[n][i].Val2) ++;
-			fprintf(fw, "%d\t%d\n", Vs[n][i].Val1.Val, Vs[n][i].Val2.Val);
+			tz.PutStrLn(TStr::Fmt("%d\t%d", Vs[n][i].Val1.Val, Vs[n][i].Val2.Val));
 		}
 	}
-	fclose(fw);
 
 	TIntPrV TriadCntV;
 	TriadCntH.GetKeyDatPrV(TriadCntV);
 	TriadCntV.Sort();
-	fw=fopen(ExM.GetGTFNm().CStr(), "w");
+	FILE* fw=fopen(ExM.GetGTFNm().CStr(), "w");
 	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
 	fprintf(fw, "# Nodes: %d\n", ExM.N);
 	for (int i=0; i<TriadCntV.Len(); i++) {
