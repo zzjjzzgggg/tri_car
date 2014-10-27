@@ -39,14 +39,14 @@ public:
 				PV[Idx(i,j)] = TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd));
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
-//		TRandom::InitUni(ThV, 1);
-		for (int i=1; i<=W; i++) ThV[i] = 1.0/W;
+		TRandom::InitUni(ThV, 1);
+//		for (int i=1; i<=W; i++) ThV[i] = 1.0/W;
 		// space for Z
 		ZV.Gen((W+1)*(M+1));
 	};
 	bool Run(const int max_iter = 500);
 private:
-	const int Idx(const int i, const int j){ return i*M+j; }
+	int Idx(const int i, const int j) const { return i*M+j; }
 	void EStep();
 	bool MStep(const double Eps=0.002);
 	void Scale();
