@@ -25,8 +25,9 @@ public:
 public:
 	TCEMGeneral(const int W, const double Pdelta, const TIntPrV& TridCnt): W(W), Pd(Pdelta) {
 		M = g = 0;
-		for (int i=1; i<TridCnt.Len(); i++) {
+		for (int i=0; i<TridCnt.Len(); i++) {
 			const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
+			if (card<=0) continue;
 			gH(card) = freq;
 			g += freq;
 			if (card > M) M = card;
@@ -38,7 +39,8 @@ public:
 				PV[Idx(i,j)] = TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd));
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
-		TRandom::InitUni(ThV, 1);
+//		TRandom::InitUni(ThV, 1);
+		for (int i=1; i<=W; i++) ThV[i] = 1.0/W;
 		// space for Z
 		ZV.Gen((W+1)*(M+1));
 	};
