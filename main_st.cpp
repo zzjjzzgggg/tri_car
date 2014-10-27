@@ -95,7 +95,7 @@ int main(int argc, char* argv[]){
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
-				"\n\tg: get groundtruth"
+				"\n\tg: get groundtruth (multi-core)"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
 	TExeTm2 tm;
