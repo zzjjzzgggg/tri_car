@@ -51,7 +51,7 @@ void em_multi(ExamMgr& ExM){
 	}
 
 	const TStr OFnm = ExM.GetTHFNm();
-	BIO::SaveFltsWithIdx(ThVs[0], OFnm, TStr::Fmt("Repeated: %d", ExM.Rpt*ExM.CPU));
+	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Repeated: %d", ExM.Rpt*ExM.CPU));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 

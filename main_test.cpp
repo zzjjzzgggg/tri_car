@@ -150,7 +150,7 @@ void count_trids_per_node(const TStr& GFNm){
 		ntrids = TSnap::GetNodeTriadsAll(G, nid);
 		NIdTrids.Add(TIntPr(nid, ntrids));
 	}
-	BIO::SaveIntPrV(NIdTrids, GFNm.GetFPath()+"NodeTrids.dat", "NId, NTrids");
+	BIO::SaveIntPrV(NIdTrids, GFNm.GetFPath()+"NodeTrids.dat", "# NId, NTrids");
 }
 
 void verify(ExamMgr& ExM){

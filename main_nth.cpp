@@ -49,7 +49,7 @@ void em_multi(ExamMgr& ExM){
 	}
 
 	const TStr OFnm = ExM.GetNTHFNm();
-	BIO::SaveFltsWithIdx(ThVs[0], OFnm, TStr::Fmt("First line is N est. Repeated: %d", ExM.Rpt*ExM.CPU));
+	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# First line is N est. Repeated: %d", ExM.Rpt*ExM.CPU));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
