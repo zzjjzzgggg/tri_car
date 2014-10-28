@@ -7,9 +7,10 @@ main
 main_th
 main_st
 main_nth
-test
+test*
 nth
 th
 st
 *.dat
 *.txt
+*.gz
