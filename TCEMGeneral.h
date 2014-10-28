@@ -27,12 +27,11 @@ public:
 		M = g = 0;
 		for (int i=0; i<TridCnt.Len(); i++) {
 			const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
-			if (card<=0) continue;
+			if (card<=0||card>W) continue;
 			gH(card) = freq;
 			g += freq;
 			if (card > M) M = card;
 		}
-		if(M>W) M=W;
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
 		TRandom::InitUni(ThV, 1);
