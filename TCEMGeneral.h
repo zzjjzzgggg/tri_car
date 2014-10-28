@@ -17,7 +17,7 @@ class TCEMGeneral {
 private:
 	int W, g;
 	double Pd;  /// p == p_delta
-	TFltV PV, ZV, ThV_pre;
+	TFltV ZV, ThV_pre;
 	TIntH gH;
 public:
 	int M;
@@ -33,11 +33,6 @@ public:
 			if (card > M) M = card;
 		}
 		if(M>W) M=W;
-		// init A
-		PV.Gen((W+1)*(M+1));
-		for (int j=1; j<=M; j++)
-			for (int i=j; i<=W; i++)
-				PV[Idx(i,j)] = TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd));
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
 		TRandom::InitUni(ThV, 1);
