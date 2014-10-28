@@ -32,6 +32,7 @@ public:
 			g += freq;
 			if (card > M) M = card;
 		}
+		if(M>W) M=W;
 		// init A
 		PV.Gen((W+1)*(M+1));
 		for (int j=1; j<=M; j++)
