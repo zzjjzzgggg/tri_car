@@ -33,6 +33,7 @@ public:
 	TStr GetNTFNm() const {
 		return GFNm.GetFPath() + TStr::Fmt("ndtriads_%s.gz", GFNm.GetFMid().CStr());
 	}
+	int GetRpt() const {return CPU*Rpt;}
 };
 
 #endif /* EXAMMGR_H_ */

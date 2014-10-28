@@ -38,20 +38,18 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 
 
 void em_multi(ExamMgr& ExM){
+	TExeTm tm;
 	TFltV ThVs[ExM.CPU];
 	for (int i=0; i<ExM.CPU; i++) ThVs[i] = TFltV(ExM.W+1);
-
 	std::vector<std::thread> threads;
 	for (int i=0; i<ExM.CPU; i++) threads.emplace_back([i, &ExM, &ThVs] { em_sub(i, ExM, ThVs[i]); });
 	for(std::thread& t: threads) t.join();
-
 	for (int i=0; i<=ExM.W; i++){
 		for (int n=1; n<ExM.CPU; n++) ThVs[0][i] += ThVs[n][i];
 		ThVs[0][i] /= ExM.CPU;
 	}
-
 	const TStr OFnm = ExM.GetTHFNm();
-	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Repeated: %d", ExM.Rpt*ExM.CPU));
+	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Repeated: %d. Avg time cost: %.2f secs.", ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt()));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
