@@ -29,4 +29,5 @@ void ExamMgr::GetSampledGraph(PNEGraph& G, const double Pe){
 		if(!G->IsNode(dst)) G->AddNode(dst);
 		G->AddEdge(src, dst);
 	}
+	G->Defrag();
 }
