@@ -44,7 +44,7 @@ public:
 private:
 	int Idx(const int i, const int j) const { return (i<=M) ? (i*(i+1)/2+j) : ((M+1)*(M+2)/2+(i-M-1)*(M+1)+j); }
 	void EStep();
-	bool MStep(const double Eps=0.002);
+	bool MStep(const double Eps=0.005);
 };
 
 #endif /* TCEM_H_ */
