@@ -37,12 +37,10 @@ public:
 		TRandom::InitUni(ThV, 1);
 //		for (int i=1; i<=W; i++) ThV[i] = 1.0/W;
 		// space for Z
-//		ZV.Gen((W+1)*(M+1));
 		ZV.Gen((M+1)*(2*W-M+2)/2);
 	};
 	bool Run(const int max_iter = 500);
 private:
-//	int Idx(const int i, const int j) const { return i*M+j; }
 	int Idx(const int i, const int j) const { return (i<=M) ? (i*(i+1)/2+j) : ((M+1)*(M+2)/2+(i-M-1)*(M+1)+j); }
 	void EStep();
 	bool MStep(const double Eps=0.005);

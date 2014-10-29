@@ -15,7 +15,7 @@ void TCEM::EStep(){
 		if (gH(j)==0) continue;
 		double norm = 0;
 		for (int i=j; i<=W; i++){
-			ZV[Idx(i,j)] = BV[Idx(i,j)]*ThV[i];
+			ZV[Idx(i,j)] = ThV[i]*TSpecFunc::Binomial(j, i, p);
 			norm += ZV[Idx(i,j)];
 			ZV[Idx(i,j)] *= gH(j);
 		}
