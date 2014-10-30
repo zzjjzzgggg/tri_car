@@ -98,8 +98,8 @@ void TCEMGeneral::ScaleTail(){
 	}
 	double qth = 0, rem = 0; // q_theta
 	for (int i=Wp+1; i<=W; i++) {
-		ThV[i] = 0;
 		rem += ThV[i];
+		ThV[i] = 0;
 	}
 	for (int i=1; i<=Wp; i++){
 		ThV[i] /= (1-rem);
