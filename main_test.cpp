@@ -7,6 +7,78 @@
 #include "stdafx.h"
 #include "ExamMgr.h"
 
+const TStr Root = "/home/jzzhao/workspace/trc/enron/cleaned/";
+
+/**
+ * count triangles per week
+ */
+void count_triangles(){
+	PNEGraph G = PNEGraph::TObj::New();
+	int pre_week = 0, ntrid = 0;
+	TIntPrV TridCnt; TIntV NTridsPerWeek;
+	TSsParser Ss(Root+"enron_add_week_no.gz");
+	while(Ss.Next()){
+		const int fid = Ss.GetInt(0), tid = Ss.GetInt(1), week = Ss.GetInt(2);
+		if(week!=pre_week && G->GetEdges()!=0) {
+			TSnap::GetTriadParticipAll(G, TridCnt);
+			for (int i=0; i<TridCnt.Len(); i++) ntrid += TridCnt[i].Val1*TridCnt[i].Val2;
+			NTridsPerWeek.Add(ntrid/3);
+			G->Clr(); TridCnt.Clr(); pre_week = week; ntrid = 0;
+		}
+		if (!G->IsNode(fid)) G->AddNode(fid);
+		if (!G->IsNode(tid)) G->AddNode(tid);
+		G->AddEdge(fid, tid);
+	}
+	BIO::SaveIntVWithIdx(NTridsPerWeek, Root+"ntrids_week.dat");
+}
+
+/**
+ * triadic cardinality distribution
+ */
+void dist_triangles(const int WK){
+	PNEGraph G = PNEGraph::TObj::New();
+	TSsParser Ss(Root+"enron_add_week_no.gz");
+	while(Ss.Next()){
+		const int fid = Ss.GetInt(0), tid = Ss.GetInt(1), week = Ss.GetInt(2);
+		if(week==WK) {
+			if (!G->IsNode(fid)) G->AddNode(fid);
+			if (!G->IsNode(tid)) G->AddNode(tid);
+			G->AddEdge(fid, tid);
+		}else if(week>WK) break;
+	}
+	TIntPrV TriadCntV;
+	TSnap::GetTriadParticipAll(G, TriadCntV);
+	int N = G->GetNodes();
+	FILE* fw=fopen((Root+TStr::Fmt("tcd_%d.dist", WK)).CStr(), "w");
+	fprintf(fw, "# Nodes: %d\n", N);
+	for (int i=0; i<TriadCntV.Len(); i++) {
+		int card = TriadCntV[i].Val1;
+		int freq = TriadCntV[i].Val2;
+		double prob = freq/(double)N;
+		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
+	}
+	fclose(fw);
+}
+
+/**
+ * degree distribution
+ */
+void dist_degree(const int WK){
+	PNEGraph G = PNEGraph::TObj::New();
+	TStr Root = "/media/WinE/workspace/triadic_cardinality/enron/";
+	TSsParser Ss(Root+"enron_add_week_no.gz");
+	while(Ss.Next()){
+		const int week = Ss.GetInt(0), fid = Ss.GetInt(1), tid = Ss.GetInt(2);
+		if(week==WK) {
+			if (!G->IsNode(fid)) G->AddNode(fid);
+			if (!G->IsNode(tid)) G->AddNode(tid);
+			G->AddEdge(fid, tid);
+		}else if(week>WK) break;
+	}
+	TIntPrV DegV;
+	TSnap::GetDegCnt<PNEGraph>(G, DegV);
+	BIO::SaveIntPrV(DegV, Root+TStr::Fmt("DegCnt_%d.dat", WK));
+}
 
 void stat_trids(ExamMgr& ExM){
 	PNEGraph G = ExM.GFull;
@@ -79,6 +151,14 @@ void verify(ExamMgr& ExM){
 }
 
 int main(int argc, char* argv[]){
+	count_triangles();
+	dist_triangles(35);
+	dist_triangles(36);
+	dist_triangles(37);
+	dist_triangles(38);
+	dist_triangles(39);
+	return 0;
+
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
@@ -86,12 +166,12 @@ int main(int argc, char* argv[]){
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
-	if (Env.IsEndOfRun()) return 0;
+//	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm tm;
-	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
+//	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
 //	verify(ExM);
-	stat_trids(ExM);
+//	stat_trids(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
