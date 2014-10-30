@@ -60,7 +60,7 @@ bool TCEMGeneral::Run(const int max_iter){
 	for (int iter=0; iter<max_iter; iter++){
 		EStep();
 		if(MStep()) {
-			Scale();
+			ScaleTail();
 			return true;
 		}
 	}
@@ -88,21 +88,23 @@ void TCEMGeneral::ScaleTail(){
 		ThV[i] /= (1 - TSpecFunc::Binomial(0, i, Pd));
 		ThV[0] += ThV[i];
 	}
-	ThV[W] /= ThV[0];
-	bool flag=true; double rem=0; int Wp=W;
-	for (int i=W-1; i>0; i--) {
+	double minval=1; int Wp=1;
+	for (int i=1; i<=W; i++) {
 		ThV[i] /= ThV[0];
-		if (flag && ThV[i+1]>ThV[i]) {
-			rem += ThV[i+1];
+		if (ThV[i]<minval){
+			minval = ThV[i];
 			Wp = i;
-		} else
-			flag = false;
+		}
 	}
-	double qth = 0; // q_theta
+	double qth = 0, rem = 0; // q_theta
+	for (int i=Wp+1; i<=W; i++) {
+		ThV[i] = 0;
+		rem += ThV[i];
+	}
 	for (int i=1; i<=Wp; i++){
 		ThV[i] /= (1-rem);
 		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
 	}
-	for (int i=Wp+1; i<=W; i++) ThV[i] = 0;
+
 	ThV[0] = g/(1-qth);// store N to ThV[0]
 }
