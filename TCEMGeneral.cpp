@@ -60,7 +60,7 @@ bool TCEMGeneral::Run(const int max_iter){
 	for (int iter=0; iter<max_iter; iter++){
 		EStep();
 		if(MStep()) {
-			ScaleTail();
+			Scale();
 			return true;
 		}
 	}
@@ -89,8 +89,7 @@ void TCEMGeneral::ScaleTail(){
 		ThV[0] += ThV[i];
 	}
 	ThV[W] /= ThV[0];
-	bool flag=true;
-	double rem = 0; int Wp=W;
+	bool flag=true; double rem=0; int Wp=W;
 	for (int i=W-1; i>0; i--) {
 		ThV[i] /= ThV[0];
 		if (flag && ThV[i+1]>ThV[i]) {
