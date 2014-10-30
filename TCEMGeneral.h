@@ -45,6 +45,7 @@ private:
 	void EStep();
 	bool MStep(const double Eps=0.005);
 	void Scale();
+	void ScaleTail();
 };
 
 #endif /* TCEMGENERAL_H_ */
