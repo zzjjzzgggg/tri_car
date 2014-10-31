@@ -17,20 +17,16 @@ using namespace std;
 
 
 void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
-	PNEGraph G = PNEGraph::TObj::New();
-	TIntPrV TridCnt;
-	int NSuc = 0;
+	int NSuc = 0; TIntPrV gV;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("rpt = %d\n", rpt);
-		ExM.GetSampledGraph(G);
-		TridCnt.Clr();
-		TSnap::GetTriadParticipAll(G, TridCnt);
-		TCEM EM(ExM.W, ExM.N, pow(ExM.PEdge, 3), TridCnt);
-		printf("[%d] Sampled: nodes: %d, edges: %d, M: %d\n", id, G->GetNodes(), G->GetEdges(), EM.M);
+		ExM.Sample(gV);
+		TCEM EM(ExM.W, ExM.N, pow(ExM.PEdge, 3), gV);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
+		printf("[%d] EM: %d\n", id, EM.Iters);
 	}
 	for (int i=0; i<ThV.Len(); i++) ThV[i] /= NSuc;
 	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);

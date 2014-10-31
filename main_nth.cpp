@@ -16,11 +16,11 @@
 using namespace std;
 
 void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
-	int NSuc = 0; TIntH gH;
+	int NSuc = 0; TIntPrV gV;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("rpt = %d\n", rpt);
-		ExM.Sample(gH);
-		TCEMGeneral EM(ExM.W, pow(ExM.PEdge, 3), gH);
+		ExM.Sample(gV);
+		TCEMGeneral EM(ExM.W, pow(ExM.PEdge, 3), gV);
 		printf("[%d] M: %d\n", id, EM.M);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];

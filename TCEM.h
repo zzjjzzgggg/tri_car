@@ -18,22 +18,22 @@ private:
 	int W, N, g;
 	double p;  /// p == p_delta
 	TFltV ZV, ThV_pre;
-	TIntH gH;
+	TIntPrV gV;
 public:
-	int M;
+	int M, Iters;
 	TFltV ThV;
 public:
-	TCEM(const int W, const int N, const double p_delta, const TIntPrV& TridCnt): W(W), N(N), p(p_delta) {
+	TCEM(const int W, const int N, const double p_delta, const TIntPrV& igV): W(W), N(N), p(p_delta), Iters(0) {
 		M = g = 0;
-		for (int i=0; i<TridCnt.Len(); i++) {
-			const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
-			if (card<=0||card>W) continue;
-			gH(card) = freq;
-			g += freq;
-			if (card > M) M = card;
+		for (int i=0; i<igV.Len(); i++) {
+			const int card = igV[i].Val1, freq = igV[i].Val2;
+			if(card>0){
+				gV.Add(TIntPr(card, freq));
+				g += freq;
+				if (card > M) M = card;
+			}
 		}
-		g -= gH(0);
-		gH(0) = N-g;
+		gV.Add(TIntPr(0, N-g));
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
 		TRandom::InitUni(ThV);

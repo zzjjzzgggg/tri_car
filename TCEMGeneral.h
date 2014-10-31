@@ -23,12 +23,10 @@ public:
 	int M, Iters;
 	TFltV ThV;
 public:
-	TCEMGeneral(const int W, const double Pdelta, const TIntH& igH): W(W), Pd(Pdelta), Iters(0) {
-		TInt card, freq;
+	TCEMGeneral(const int W, const double Pdelta, const TIntPrV& igV): W(W), Pd(Pdelta), Iters(0) {
 		M = g = 0;
-		for (int i=0; i<igH.Len(); i++) {
-			igH.GetKeyDat(i, card, freq);
-			Assert(card<=W);
+		for (int i=0; i<igV.Len(); i++) {
+			const int card = igV[i].Val1, freq = igV[i].Val2;
 			if(card>0){
 				gV.Add(TIntPr(card, freq));
 				g += freq;

@@ -33,7 +33,7 @@ void ExamMgr::GetSampledGraph(PNEGraph& G, const double Pe){
 }
 
 
-void ExamMgr::Sample(TIntH& gH, const double Pe){
+void ExamMgr::Sample(TIntPrV& gV, const double Pe){
 	const double p = Pe<0 ? PEdge : Pe;
 	PNEGraph G = PNEGraph::TObj::New();
 	TRnd rnd;
@@ -46,10 +46,9 @@ void ExamMgr::Sample(TIntH& gH, const double Pe){
 	}
 	TIntPrV TridCnt;
 	TSnap::GetTriadParticipAll<PNEGraph>(G, TridCnt);
-	gH.Clr();
+	gV.Clr();
 	for (int i=0; i<TridCnt.Len(); i++) {
 		const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
-		if (card<0||card>W) continue;
-		gH(card) = freq;
+		if (card>=0 && card<=W) gV.Add(TIntPr(card, freq));
 	}
 }
