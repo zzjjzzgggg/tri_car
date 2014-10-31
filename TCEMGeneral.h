@@ -23,19 +23,21 @@ public:
 	int M;
 	TFltV ThV;
 public:
-	TCEMGeneral(const int W, const double Pdelta, const TIntPrV& TridCnt): W(W), Pd(Pdelta) {
+	TCEMGeneral(const int W, const double Pdelta, const TIntH& igH): W(W), Pd(Pdelta) {
+		TInt card, freq;
 		M = g = 0;
-		for (int i=0; i<TridCnt.Len(); i++) {
-			const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
-			if (card<=0||card>W) continue;
-			gH(card) = freq;
-			g += freq;
-			if (card > M) M = card;
+		for (int i=0; i<igH.Len(); i++) {
+			igH.GetKeyDat(i, card, freq);
+			Assert(card<=W);
+			if(card>0){
+				gH(card) = freq;
+				g += freq;
+				if (card > M) M = card;
+			}
 		}
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
 		TRandom::InitUni(ThV, 1);
-//		for (int i=1; i<=W; i++) ThV[i] = 1.0/W;
 		// space for Z
 		ZV.Gen((M+1)*(2*W-M+2)/2);
 	};

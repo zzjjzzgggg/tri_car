@@ -16,16 +16,12 @@
 using namespace std;
 
 void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
-	int NSuc = 0;
-	PNEGraph G = PNEGraph::TObj::New();
-	TIntPrV TridCnt;
+	int NSuc = 0; TIntH gH;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("rpt = %d\n", rpt);
-		ExM.GetSampledGraph(G);
-		TridCnt.Clr();
-		TSnap::GetTriadParticipAll(G, TridCnt);
-		TCEMGeneral EM(ExM.W, pow(ExM.PEdge, 3), TridCnt);
-		printf("[%d] Sampled: nodes: %d, edges: %d, M: %d\n", id, G->GetNodes(), G->GetEdges(), EM.M);
+		ExM.Sample(gH);
+		TCEMGeneral EM(ExM.W, pow(ExM.PEdge, 3), gH);
+		printf("[%d] M: %d\n", id, EM.M);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;

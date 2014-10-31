@@ -49,7 +49,6 @@ bool TCEMGeneral::MStep(const double Eps){
 		ThV[i] /= norm;
 		diff += TMath::Abs(ThV[i]-ThV_pre[i]);
 	}
-//	printf("%.6f\n", diff);
 	return diff <= Eps;
 }
 

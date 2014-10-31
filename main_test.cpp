@@ -151,14 +151,6 @@ void verify(ExamMgr& ExM){
 }
 
 int main(int argc, char* argv[]){
-	count_triangles();
-	dist_triangles(35);
-	dist_triangles(36);
-	dist_triangles(37);
-	dist_triangles(38);
-	dist_triangles(39);
-	return 0;
-
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
@@ -166,10 +158,17 @@ int main(int argc, char* argv[]){
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
-//	if (Env.IsEndOfRun()) return 0;
+	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm tm;
-//	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
+	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
+	TIntH gH;
+	ExM.Sample(gH);
+	for (int i=0; i<gH.Len(); i++) {
+		printf("%d: %d  ", gH.GetKey(i).Val, gH[i].Val);
+		if ((i+1)%5==0) printf("\n");
+	}
+	printf("\n");
 //	verify(ExM);
 //	stat_trids(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());

@@ -21,6 +21,7 @@ public:
 public:
 	ExamMgr(const TStr& GFnm, const int NCPU=8, const int MX_TC=10000, const double Pe=0.1, const int NRpt=12);
 	void GetSampledGraph(PNEGraph& G, const double Pe=-1);
+	void Sample(TIntH& gH, const double Pe=-1);
 	TStr GetTHFNm() const{
 		return GFNm.GetFPath() + TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge);
 	}
