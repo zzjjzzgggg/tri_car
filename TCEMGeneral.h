@@ -41,7 +41,7 @@ public:
 		// space for Z
 		ZV.Gen((M+1)*(2*W-M+2)/2);
 	};
-	bool Run(const int max_iter = 500);
+	bool Run(const int max_iter = 300);
 private:
 	int Idx(const int i, const int j) const { return (i<=M) ? (i*(i+1)/2+j) : ((M+1)*(M+2)/2+(i-M-1)*(M+1)+j); }
 	void EStep();
