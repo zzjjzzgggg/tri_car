@@ -45,7 +45,7 @@ void ExamMgr::Sample(TIntH& gH, const double Pe){
 		G->AddEdge(src, dst);
 	}
 	TIntPrV TridCnt;
-	TSnap::GetTriadParticipAll(G, TridCnt);
+	TSnap::GetTriadParticipAll<PNEGraph>(G, TridCnt);
 	gH.Clr();
 	for (int i=0; i<TridCnt.Len(); i++) {
 		const int card = TridCnt[i].Val1, freq = TridCnt[i].Val2;
