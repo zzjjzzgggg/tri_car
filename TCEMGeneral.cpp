@@ -60,7 +60,7 @@ bool TCEMGeneral::Run(const int max_iter){
 	for (int iter=0; iter<max_iter; iter++){
 		EStep();
 		if(MStep()) {
-			ScaleTail();
+			Scale();
 			return true;
 		}
 	}
