@@ -12,17 +12,19 @@
  */
 void TCEMGeneral::EStep(){
 	// estimate g0
-	double norm;
-	for (int j=1; j<=M; j++){
-		if (gH(j)==0) continue;
-		norm = 0;
+	for (int id=0; id<gV.Len(); id++){
+		const int j = gV[id].Val1, freq = gV[id].Val2;
+		double norm = 0;
 		for (int i=j; i<=W; i++){
-			ZV[Idx(i,j)] = ThV[i]*(TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd)));
-			norm += ZV[Idx(i,j)];
-			ZV[Idx(i,j)] *= gH(j);
+			const int k = Idx(i,j);
+			ZV[k] = ThV[i]*AV[k];
+			norm += ZV[k];
+			ZV[k] *= freq;
 		}
-		for (int i=j; i<=W; i++)
-			ZV[Idx(i,j)] = norm<1E-9 ? 0 : ZV[Idx(i,j)]/norm;
+		for (int i=j; i<=W; i++){
+			const int k = Idx(i,j);
+			ZV[k] = norm<1E-10 ? 0 : ZV[k]/norm;
+		}
 	}
 }
 
@@ -37,10 +39,12 @@ bool TCEMGeneral::MStep(const double Eps){
 	}
 	// now update
 	double norm = 0;
-	for (int j=1; j<=M; j++){
+	for (int id=0; id<gV.Len(); id++){
+		const int j = gV[id].Val1;
 		for(int i=j; i<=W; i++){
-			ThV[i] += ZV[Idx(i,j)];
-			norm += ZV[Idx(i,j)];
+			const int k = Idx(i,j);
+			ThV[i] += ZV[k];
+			norm += ZV[k];
 		}
 	}
 	// normalize Thv and calculate diff
@@ -56,12 +60,14 @@ bool TCEMGeneral::MStep(const double Eps){
  * do EM iterations
  */
 bool TCEMGeneral::Run(const int max_iter){
-	for (int iter=0; iter<max_iter; iter++){
+	for (Iters=0; Iters<max_iter; Iters++){
 		EStep();
+//		printf("E\n");
 		if(MStep()) {
 			Scale();
 			return true;
 		}
+//		printf("M %d\n", Iters);
 	}
 	return false;
 }
