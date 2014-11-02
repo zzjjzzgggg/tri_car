@@ -107,6 +107,7 @@ void TCEMGeneral::ScaleTail(){
 		rem += ThV[i];
 		ThV[i] = 0;
 	}
+	Assert(rem<1 && Wp>1);
 	for (int i=1; i<=Wp; i++){
 		ThV[i] /= (1-rem);
 		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
