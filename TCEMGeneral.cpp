@@ -87,34 +87,3 @@ void TCEMGeneral::Scale(){
 	ThV[0] = g/(1-qth);// store N to ThV[0]
 }
 
-
-void TCEMGeneral::ScaleTail(){
-	ThV[0] = 0;
-	for (int i=1; i<=W; i++) {
-		ThV[i] /= (1 - TSpecFunc::Binomial(0, i, Pd));
-		ThV[0] += ThV[i];
-	}
-	double minval=1; int Wp=1;
-	for (int i=1; i<=W; i++) {
-		ThV[i] /= ThV[0];
-		if (ThV[i]<minval){
-			minval = ThV[i];
-			Wp = i;
-		}
-	}
-	double qth = 0, rem = 0; // q_theta
-	if (Wp > 1){
-		for (int i=Wp+1; i<=W; i++) {
-			rem += ThV[i];
-			ThV[i] = 0;
-		}
-	} else
-		Wp = W;
-//	AssertR(rem<1 && Wp>1, TStr::Fmt("rem: %.2f, Wp: %d", rem, Wp));
-	for (int i=1; i<=Wp; i++){
-		ThV[i] /= (1-rem);
-		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
-	}
-
-	ThV[0] = g/(1-qth);// store N to ThV[0]
-}

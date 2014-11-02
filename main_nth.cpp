@@ -52,7 +52,7 @@ void trim_tail(ExamMgr& ExM, TFltV& ThV){
 		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
 	}
 
-	printf("min val = %.2f   Wp=%d  rem = %.2f\n", minval, Wp, rem);
+	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
 	ThV[0] *= (1-qth_pre)/(1-qth);
 }
 
