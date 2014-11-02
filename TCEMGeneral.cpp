@@ -48,7 +48,7 @@ bool TCEMGeneral::MStep(const double Eps){
 		}
 	}
 	// normalize Thv and calculate diff
-	Assert(norm>0);
+	AssertR(norm>0, TStr::Fmt("%.6e", norm));
 	double diff = 0; //TMath::Abs(N-N_pre);
 	for (int i=1; i<=W; i++) {
 		ThV[i] /= norm;
