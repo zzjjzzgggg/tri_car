@@ -22,7 +22,7 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 		ExM.Sample(gV);
 		TCEMGeneral EM(ExM.W, pow(ExM.PEdge, 3), gV);
 		printf("[%d] M: %d\n", id, EM.M);
-		if (EM.Run(ExM.TrimTail)) {
+		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
@@ -30,6 +30,29 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 	}
 	for (int i=0; i<ThV.Len(); i++) ThV[i] /= NSuc;
 	printf("[%d] Rpt/Suc: %d/%d\n", id, ExM.Rpt, NSuc);
+}
+
+void trim_tail(ExamMgr& ExM, TFltV& ThV){
+	double qth_pre = 0, minval=1, Pd = pow(ExM.PEdge,3);
+	int Wp=1;
+	for (int i=1; i<=ExM.W; i++) {
+		qth_pre += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
+		if (ThV[i]<minval){
+			minval = ThV[i];
+			Wp = i;
+		}
+	}
+	double qth = 0, rem = 0; // q_theta
+	for (int i=Wp+1; i<=ExM.W; i++) {
+		rem += ThV[i];
+		ThV[i] = 0;
+	}
+	for (int i=1; i<=Wp; i++){
+		ThV[i] /= (1-rem);
+		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
+	}
+
+	ThV[0] *= ((1-qth_pre)/(1-qth));
 }
 
 void em_multi(ExamMgr& ExM){
@@ -43,6 +66,7 @@ void em_multi(ExamMgr& ExM){
 		for (int n=1; n<ExM.CPU; n++) ThVs[0][i] += ThVs[n][i];
 		ThVs[0][i] /= ExM.CPU;
 	}
+	if (ExM.TrimTail) trim_tail(ExM, ThVs[0]);
 	const TStr OFnm = ExM.GetNTHFNm();
 	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# First line is N est. Repeated: %d. Avg time cost: %.2f secs.", ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt()));
 	printf("Saved to %s\n", OFnm.CStr());
