@@ -84,7 +84,7 @@ int main(int argc, char* argv[]){
 	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
+	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt, TrimTail);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
