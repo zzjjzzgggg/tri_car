@@ -7,7 +7,7 @@
 
 #include "ExamMgr.h"
 
-ExamMgr::ExamMgr(const TStr& GFnm, const int NCPU, const int MX_TC, const double Pe, const int NRpt) {
+ExamMgr::ExamMgr(const TStr& GFnm, const int NCPU, const int MX_TC, const double Pe, const int NRpt, const bool Tail) {
 	// TODO Auto-generated constructor stub
 	GFNm = GFnm;
 	GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
@@ -16,6 +16,7 @@ ExamMgr::ExamMgr(const TStr& GFnm, const int NCPU, const int MX_TC, const double
 	PEdge = Pe;
 	CPU = NCPU;
 	Rpt = NRpt;
+	TrimTail = Tail;
 }
 
 void ExamMgr::GetSampledGraph(PNEGraph& G, const double Pe){

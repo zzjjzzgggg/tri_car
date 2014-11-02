@@ -59,12 +59,13 @@ bool TCEMGeneral::MStep(const double Eps){
 /**
  * do EM iterations
  */
-bool TCEMGeneral::Run(const int max_iter){
+bool TCEMGeneral::Run(const bool TrimTail, const int max_iter){
 	for (Iters=0; Iters<max_iter; Iters++){
 		EStep();
 //		printf("E\n");
 		if(MStep()) {
-			ScaleTail();
+			if (TrimTail) ScaleTail();
+			else Scale();
 			return true;
 		}
 //		printf("M %d\n", Iters);

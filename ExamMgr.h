@@ -18,8 +18,9 @@ public:
 	PNEGraph GFull;
 	int N, W, CPU, Rpt;
 	double PEdge;
+	bool TrimTail;
 public:
-	ExamMgr(const TStr& GFnm, const int NCPU=8, const int MX_TC=10000, const double Pe=0.1, const int NRpt=12);
+	ExamMgr(const TStr& GFnm, const int NCPU=8, const int MX_TC=10000, const double Pe=0.1, const int NRpt=12, const bool Tail=false);
 	void GetSampledGraph(PNEGraph& G, const double Pe=-1);
 	void Sample(TIntPrV& gV, const double Pe=-1);
 	TStr GetTHFNm() const{
