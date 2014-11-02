@@ -33,6 +33,26 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);
 }
 
+void trim_tail(ExamMgr& ExM, TFltV& ThV){
+	double minval=1, Pd = pow(ExM.PEdge,3);
+	int Wp=1;
+	for (int i=0; i<=ExM.W; i++) {
+		if (ThV[i] < minval){
+			minval = ThV[i];
+			Wp = i;
+		}
+	}
+	double qth = 0, rem = 0; // q_theta
+	for (int i=Wp+1; i<=ExM.W; i++) {
+		rem += ThV[i];
+		ThV[i] = 0;
+	}
+	for (int i=0; i<=Wp; i++){
+		ThV[i] /= (1-rem);
+		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
+	}
+	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
+}
 
 void em_multi(ExamMgr& ExM){
 	TExeTm tm;
@@ -51,29 +71,6 @@ void em_multi(ExamMgr& ExM){
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
-void trim_tail(ExamMgr& ExM, TFltV& ThV){
-	double qth_pre = 0, minval=1, Pd = pow(ExM.PEdge,3);
-	int Wp=1;
-	for (int i=1; i<=ExM.W; i++) {
-		qth_pre += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
-		if (ThV[i] < minval){
-			minval = ThV[i];
-			Wp = i;
-		}
-	}
-	double qth = 0, rem = 0; // q_theta
-	for (int i=Wp+1; i<=ExM.W; i++) {
-		rem += ThV[i];
-		ThV[i] = 0;
-	}
-	for (int i=1; i<=Wp; i++){
-		ThV[i] /= (1-rem);
-		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
-	}
-
-	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
-	ThV[0] *= (1-qth_pre)/(1-qth);
-}
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
