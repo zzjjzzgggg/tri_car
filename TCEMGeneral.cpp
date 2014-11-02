@@ -64,7 +64,7 @@ bool TCEMGeneral::Run(const int max_iter){
 		EStep();
 //		printf("E\n");
 		if(MStep()) {
-			Scale();
+			ScaleTail();
 			return true;
 		}
 //		printf("M %d\n", Iters);
