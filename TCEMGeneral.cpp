@@ -103,11 +103,14 @@ void TCEMGeneral::ScaleTail(){
 		}
 	}
 	double qth = 0, rem = 0; // q_theta
-	for (int i=Wp+1; i<=W; i++) {
-		rem += ThV[i];
-		ThV[i] = 0;
-	}
-	AssertR(rem<1 && Wp>1, TStr::Fmt("rem: %.2f, Wp: %d", rem, Wp));
+	if (Wp > 1){
+		for (int i=Wp+1; i<=W; i++) {
+			rem += ThV[i];
+			ThV[i] = 0;
+		}
+	} else
+		Wp = W;
+//	AssertR(rem<1 && Wp>1, TStr::Fmt("rem: %.2f, Wp: %d", rem, Wp));
 	for (int i=1; i<=Wp; i++){
 		ThV[i] /= (1-rem);
 		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
