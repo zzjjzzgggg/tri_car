@@ -56,7 +56,7 @@ int main(int argc, char* argv[]){
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
-	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail, default no");
+	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
 	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm2 tm;
