@@ -48,6 +48,7 @@ bool TCEMGeneral::MStep(const double Eps){
 		}
 	}
 	// normalize Thv and calculate diff
+	Assert(norm>0);
 	double diff = 0; //TMath::Abs(N-N_pre);
 	for (int i=1; i<=W; i++) {
 		ThV[i] /= norm;
@@ -64,7 +65,7 @@ bool TCEMGeneral::Run(const int max_iter){
 		EStep();
 //		printf("E\n");
 		if(MStep()) {
-			ScaleTail();
+			Scale();
 			return true;
 		}
 //		printf("M %d\n", Iters);

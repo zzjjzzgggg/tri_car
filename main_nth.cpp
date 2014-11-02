@@ -37,7 +37,7 @@ void trim_tail(ExamMgr& ExM, TFltV& ThV){
 	int Wp=1;
 	for (int i=1; i<=ExM.W; i++) {
 		qth_pre += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
-		if (ThV[i]<minval){
+		if (ThV[i] < minval){
 			minval = ThV[i];
 			Wp = i;
 		}
@@ -52,7 +52,8 @@ void trim_tail(ExamMgr& ExM, TFltV& ThV){
 		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
 	}
 
-	ThV[0] *= ((1-qth_pre)/(1-qth));
+	printf("min val = %.2f   Wp=%d  rem = %.2f\n", minval, Wp, rem);
+	ThV[0] *= (1-qth_pre)/(1-qth);
 }
 
 void em_multi(ExamMgr& ExM){
