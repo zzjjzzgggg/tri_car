@@ -16,7 +16,7 @@ void TCEM::EStep(){
 		double norm = 0;
 		for (int i=j; i<=W; i++){
 			const int k = Idx(i,j);
-			ZV[k] = ThV[i]*TSpecFunc::Binomial(j, i, p);
+			ZV[k] = ThV[i]*BV[k];
 			norm += ZV[k];
 			ZV[k] *= freq;
 		}

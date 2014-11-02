@@ -27,7 +27,7 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
-		printf("[%d] EM: %d\n", id, EM.Iters);
+//		printf("[%d] EM: %d\n", id, EM.Iters);
 	}
 	for (int i=0; i<ThV.Len(); i++) ThV[i] /= NSuc;
 	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);

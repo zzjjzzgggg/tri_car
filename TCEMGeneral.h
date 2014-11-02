@@ -38,7 +38,7 @@ public:
 		for (int id=0; id<gV.Len(); id++){
 			int j = gV[id].Val1;
 			for (int i=j; i<=W; i++)
-				AV[Idx(i,j)] = (TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd)));
+				AV[Idx(i,j)] = TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd));
 		}
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);

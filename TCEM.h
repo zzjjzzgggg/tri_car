@@ -16,14 +16,14 @@
 class TCEM {
 private:
 	int W, N, g;
-	double p;  /// p == p_delta
-	TFltV ZV, ThV_pre;
+	double Pd;  /// p == p_delta
+	TFltV BV, ZV, ThV_pre;
 	TIntPrV gV;
 public:
 	int M, Iters;
 	TFltV ThV;
 public:
-	TCEM(const int W, const int N, const double p_delta, const TIntPrV& igV): W(W), N(N), p(p_delta), Iters(0) {
+	TCEM(const int W, const int N, const double p_delta, const TIntPrV& igV): W(W), N(N), Pd(p_delta), Iters(0) {
 		M = g = 0;
 		for (int i=0; i<igV.Len(); i++) {
 			const int card = igV[i].Val1, freq = igV[i].Val2;
@@ -34,6 +34,13 @@ public:
 			}
 		}
 		gV.Add(TIntPr(0, N-g));
+		// init B
+		BV.Gen((M+1)*(2*W-M+2)/2);
+		for (int id=0; id<gV.Len(); id++){
+			int j = gV[id].Val1;
+			for (int i=j; i<=W; i++)
+				BV[Idx(i,j)] = TSpecFunc::Binomial(j, i, Pd);
+		}
 		// init Theta
 		ThV.Gen(W+1); ThV_pre.Gen(W+1);
 		TRandom::InitUni(ThV);
