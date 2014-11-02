@@ -69,7 +69,7 @@ void em_multi(ExamMgr& ExM){
 	}
 	if (ExM.TrimTail) trim_tail(ExM, ThVs[0]);
 	const TStr OFnm = ExM.GetNTHFNm();
-	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# First line is N est. Repeated: %d. Avg time cost: %.2f secs.", ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt()));
+	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Nodes: %d\n# First line is N est. \n# Repeated: %d. Avg time cost: %.2f secs.", ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt()));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
