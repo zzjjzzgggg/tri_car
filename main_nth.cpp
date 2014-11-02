@@ -22,7 +22,7 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 		ExM.Sample(gV);
 		TCEMGeneral EM(ExM.W, pow(ExM.PEdge, 3), gV);
 		printf("[%d] M: %d\n", id, EM.M);
-		if (EM.Run()) {
+		if (EM.Run(ExM.TrimTail)) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
