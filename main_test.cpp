@@ -37,7 +37,7 @@ void count_triangles(){
  */
 void dist_triangles(const int WK){
 	PNEGraph G = PNEGraph::TObj::New();
-	TSsParser Ss(Root+"enron_add_week_no.gz");
+	TSsParser Ss(Root+"enron_cleaned.gz");
 	while(Ss.Next()){
 		const int fid = Ss.GetInt(0), tid = Ss.GetInt(1), week = Ss.GetInt(2);
 		if(week==WK) {
@@ -46,6 +46,8 @@ void dist_triangles(const int WK){
 			G->AddEdge(fid, tid);
 		}else if(week>WK) break;
 	}
+	TSnap::SaveEdgeList(G, Root+TStr::Fmt("enron_%d.gz", WK));
+	return;
 	TIntPrV TriadCntV;
 	TSnap::GetTriadParticipAll(G, TriadCntV);
 	int N = G->GetNodes();
@@ -150,7 +152,146 @@ void verify(ExamMgr& ExM){
 	printf("[3] N est: %.6f\n", nest_hat3/norm);
 }
 
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+const int SID = 100000, N = 22477;
+////////////////////////////////////////////////////////
+
+int add_spamming_rnd(const TIntV& Nodes, const PNEGraph& OriG, const int NSpam, TIntPrV& TriadCntV){
+	PNEGraph G = PNEGraph::New();
+	for (TNEGraph::TEdgeI EI = OriG->BegEI(); EI < OriG->EndEI(); EI++) {
+		if (!G->IsNode(EI.GetSrcNId())) G->AddNode(EI.GetSrcNId());
+		if (!G->IsNode(EI.GetDstNId())) G->AddNode(EI.GetDstNId());
+		G->AddEdge(EI);
+	}
+	G->AddNode(SID);
+
+	TIntV targets;
+	TRandom::ChooseWithReplacement(Nodes, targets, NSpam);
+	for (int i=0; i<NSpam; i++){
+		if (!G->IsNode(targets[i])) G->AddNode(targets[i]);
+		G->AddEdge(SID, targets[i]);
+	}
+	printf("nspam: %d, nodes: %d, edges: %d\n", NSpam, G->GetNodes(), G->GetEdges());
+
+	TriadCntV.Clr();
+	TSnap::GetTriadParticipAll(G, TriadCntV);
+	/*
+	FILE* fw=fopen((Root+TStr::Fmt("enron_22_SP%dK.dist", NSpam/1000)).CStr(), "w");
+	fprintf(fw, "# Nodes: %d\n", N);
+	for (int i=0; i<TriadCntV.Len(); i++) {
+		int card = TriadCntV[i].Val1;
+		int freq = TriadCntV[i].Val2;
+		if (card == 0) freq += (N - G->GetNodes());
+		double prob = freq/(double)N;
+		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
+	}
+	fclose(fw);
+	*/
+	return N - G->GetNodes();
+}
+
+double KL(const TIntPrV& PV, const TIntH& QH){
+	int k;
+	double p, q, rst=0;
+	for (int i=0; i<PV.Len(); i++) {
+		k = PV[i].Val1;
+		p = PV[i].Val2/(double)N;
+		if (!QH.IsKey(k)) q = 1E-10;
+		else q = QH(k)/(double)N;
+		rst += p*log(p/q);
+	}
+	return rst;
+}
+
+void spam_rnd(const int R){
+	TIntPrV PV, QV;
+	TIntH QH;
+	TIntFltKdV klV;
+	TIntV Nodes;
+	BIO::LoadIntV(Root+"nodes.gz", Nodes);
+	BIO::LoadIntPrV(Root+"tcd_22.dist", PV);
+	PNEGraph OriG = TSnap::LoadEdgeList<PNEGraph>(Root+"enron_22.gz");
+	for (int i=1; i<=10; i++){
+		const int NSpam = i*1000;
+		double kl = 0;
+		for (int r=0; r<R; r++){
+			const int delta = add_spamming_rnd(Nodes, OriG, NSpam, QV);
+			QH.Clr();
+			for (int i=0; i<QV.Len(); i++) QH(QV[i].Val1) = QV[i].Val2;
+			QH[0] += delta;
+			kl += KL(PV, QH);
+		}
+		klV.Add(TIntFltKd(i, kl/R));
+	}
+	BIO::SaveIntFltKdV(klV, Root+"KL_rnd.dat");
+}
+
+int add_spamming_friend(const PUNGraph& FG, const PNEGraph& OriG, const int NSpam, TIntPrV& TriadCntV){
+	PNEGraph G = PNEGraph::New();
+	for (TNEGraph::TEdgeI EI = OriG->BegEI(); EI < OriG->EndEI(); EI++) {
+		if (!G->IsNode(EI.GetSrcNId())) G->AddNode(EI.GetSrcNId());
+		if (!G->IsNode(EI.GetDstNId())) G->AddNode(EI.GetDstNId());
+		G->AddEdge(EI);
+	}
+	G->AddNode(SID);
+	for (int i=0; i<NSpam/2; i++){
+		const int tar1 = FG->GetRndNId();
+		TUNGraph::TNodeI NI = FG->GetNI(tar1);
+		const int tar2 = NI.GetDeg()==0 ? tar1 : NI.GetRndNbhNId();
+		if (!G->IsNode(tar1)) G->AddNode(tar1);
+		if (!G->IsNode(tar2)) G->AddNode(tar2);
+		G->AddEdge(SID, tar1);
+		G->AddEdge(SID, tar2);
+	}
+	printf("nspam: %d, nodes: %d, edges: %d\n", NSpam, G->GetNodes(), G->GetEdges());
+
+	TriadCntV.Clr();
+	TSnap::GetTriadParticipAll(G, TriadCntV);
+/*
+	FILE* fw=fopen((Root+TStr::Fmt("enron_22_SP%dK_fnd.dist", NSpam/1000)).CStr(), "w");
+	fprintf(fw, "# Nodes: %d\n", N);
+	for (int i=0; i<TriadCntV.Len(); i++) {
+		int card = TriadCntV[i].Val1;
+		int freq = TriadCntV[i].Val2;
+		if (card == 0) freq += (N - G->GetNodes());
+		double prob = freq/(double)N;
+		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
+	}
+	fclose(fw);
+*/
+	return N - G->GetNodes();
+}
+
+void spam_friend(const int R){
+	TIntPrV PV, QV;
+	TIntH QH;
+	TIntFltKdV klV;
+	BIO::LoadIntPrV(Root+"tcd_22.dist", PV);
+	PUNGraph FriendG = TSnap::LoadEdgeList<PUNGraph>(Root+"enron_cleaned.gz");
+	PNEGraph OriG = TSnap::LoadEdgeList<PNEGraph>(Root+"enron_22.gz");
+	for (int i=1; i<=10; i++){
+		const int NSpam = i*1000;
+		double kl = 0;
+		for (int r=0; r<R; r++){
+			const int delta = add_spamming_friend(FriendG, OriG, NSpam, QV);
+			QH.Clr();
+			for (int i=0; i<QV.Len(); i++) QH(QV[i].Val1) = QV[i].Val2;
+			QH[0] += delta;
+			kl += KL(PV, QH);
+		}
+		klV.Add(TIntFltKd(i, kl/R));
+	}
+	BIO::SaveIntFltKdV(klV, Root+"KL_friend.dat");
+}
+
+
 int main(int argc, char* argv[]){
+//	dist_triangles(22);
+//	spam_rnd(10);
+	spam_friend(10);
+	return 0;
+
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
@@ -162,15 +303,7 @@ int main(int argc, char* argv[]){
 
 	TExeTm tm;
 	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-	TIntH gH;
-	ExM.Sample(gH);
-	for (int i=0; i<gH.Len(); i++) {
-		printf("%d: %d  ", gH.GetKey(i).Val, gH[i].Val);
-		if ((i+1)%5==0) printf("\n");
-	}
-	printf("\n");
-//	verify(ExM);
-//	stat_trids(ExM);
+
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
