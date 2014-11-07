@@ -27,7 +27,7 @@ public:
 		M = g = 0;
 		for (int i=0; i<igV.Len(); i++) {
 			const int card = igV[i].Val1, freq = igV[i].Val2;
-			if(card>0){
+			if(card>=1 && card<=W){
 				gV.Add(TIntPr(card, freq));
 				g += freq;
 				if (card > M) M = card;

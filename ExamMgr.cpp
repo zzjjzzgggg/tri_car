@@ -52,7 +52,6 @@ void ExamMgr::SampleUC(TIntPrV& gV){
 		if(!G->IsNode(u)) G->AddNode(u);
 		if(!G->IsNode(c)) G->AddNode(c);
 		G->AddEdge(u, c);
-
 		if(!UCGSampled->IsSrcNode(u)) UCGSampled->AddSrcNode(u);
 		if(!UCGSampled->IsDstNode(c)) UCGSampled->AddDstNode(c);
 		UCGSampled->AddEdge(ei);
@@ -75,7 +74,7 @@ void ExamMgr::SampleUC(TIntPrV& gV){
 	gV.Clr();
 	for (int id = TridCntH.FFirstKeyId(); TridCntH.FNextKeyId(id); ){
 		const int card = TridCntH.GetKey(id), freq = TridCntH[id];
-		if (card>=0 && card<=W) gV.Add(TIntPr(card, freq));
+		gV.Add(TIntPr(card, freq));
 	}
 }
 
