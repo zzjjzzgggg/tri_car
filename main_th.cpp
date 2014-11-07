@@ -13,15 +13,13 @@
 #include "TCEM.h"
 #include "ExamMgr.h"
 
-using namespace std;
-
 
 void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 	int NSuc = 0; TIntPrV gV;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("rpt = %d\n", rpt);
 		ExM.Sample(gV);
-		TCEM EM(ExM.W, ExM.N, pow(ExM.PEdge, 3), gV);
+		TCEM EM(ExM.W, ExM.N, ExM.GetPdUU(), gV);
 		printf("[%d] M: %d\n", id, EM.M);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
@@ -77,7 +75,7 @@ int main(int argc, char* argv[]){
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
+	const int CPU = Env.GetIfArgPrefixInt("-n:", std::thread::hardware_concurrency(), "Cores to use");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");

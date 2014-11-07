@@ -289,21 +289,26 @@ void spam_friend(const int R){
 int main(int argc, char* argv[]){
 //	dist_triangles(22);
 //	spam_rnd(10);
-	spam_friend(10);
-	return 0;
+//	spam_friend(10);
+//	return 0;
 
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
+	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "test.graph", "Follower graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
 	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
+	const double Pr = Env.GetIfArgPrefixFlt("-q:", 0.1, "Relation sampling rate");
+	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
 	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm tm;
-	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-
+//	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
+	ExamMgr ExM(GFNm, FGFNm, CPU, W, Pe, Pr, Rpt, TrimTail);
+	TIntPrV gV;
+	ExM.SampleUC(gV);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }

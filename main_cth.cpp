@@ -17,14 +17,14 @@ void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 	int NSuc = 0; TIntPrV gV;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("rpt = %d\n", rpt);
-		ExM.Sample(gV);
-		TCEMGeneral EM(ExM.W, ExM.GetPdUU(), gV);
+		ExM.SampleUC(gV);
+		TCEMGeneral EM(ExM.W, ExM.GetPdUC(), gV);
 		printf("[%d] M: %d\n", id, EM.M);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
-//		printf("[%d] EM: %d\n", id, EM.Iters);
+		printf("[%d] EM: %d\n", id, EM.Iters);
 	}
 	for (int i=0; i<ThV.Len(); i++) ThV[i] /= NSuc;
 	printf("[%d] Rpt/Suc: %d/%d\n", id, ExM.Rpt, NSuc);
@@ -65,7 +65,7 @@ void em_multi(ExamMgr& ExM){
 		for (int n=1; n<ExM.CPU; n++) ThVs[0][i] += ThVs[n][i];
 		ThVs[0][i] /= ExM.CPU;
 	}
-	if (ExM.TrimTail) trim_tail(ExM, ThVs[0]);
+	if (ExM.TrimTail)  trim_tail(ExM, ThVs[0]);
 	const TStr OFnm = ExM.GetNTHFNm();
 	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Nodes: %d\n# First line is N est. \n# Repeated: %d. Avg time cost: %.2f secs.", ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt()));
 	printf("Saved to %s\n", OFnm.CStr());
@@ -74,16 +74,18 @@ void em_multi(ExamMgr& ExM){
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
-	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
+	const TStr GFNm = Env.GetIfArgPrefixStr("-uc:", "uc.graph", "User-cont interaction graph");
+	const TStr FGFNm = Env.GetIfArgPrefixStr("-fg:", "fg.graph", "Follower graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
 	const int CPU = Env.GetIfArgPrefixInt("-n:", std::thread::hardware_concurrency(), "Cores to use");
-	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
-	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
+	const double Pe = Env.GetIfArgPrefixFlt("-pe:", 0.1, "Edge sampling rate");
+	const double Pr = Env.GetIfArgPrefixFlt("-pr:", 0.1, "Relation sampling rate");
 	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
-	if (Env.IsEndOfRun()) return 0;
+	if (Env.IsEndOfRun())  return 0;
 
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt, TrimTail);
+	ExamMgr ExM(GFNm, FGFNm, CPU, W, Pe, Pr, Rpt, TrimTail);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;

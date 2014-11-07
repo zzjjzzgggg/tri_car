@@ -11,8 +11,6 @@
 #include <vector>
 #include <thread>
 
-using namespace std;
-
 #include "stdafx.h"
 #include "Queue.h"
 #include "ExamMgr.h"
@@ -90,7 +88,7 @@ int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
+	const int CPU = Env.GetIfArgPrefixInt("-n:", std::thread::hardware_concurrency(), "Cores to use");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");

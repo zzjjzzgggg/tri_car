@@ -10,7 +10,7 @@ SNAPDIR = /home/jzzhao/git_project/netsnap
 LIB = -I $(SNAPDIR)/glib -I $(SNAPDIR)/snap 
 OBJ = Snap.o TCEM.o ExamMgr.o TCEMGeneral.o
 
-all: th
+all: test
 
 opt: CXXFLAGS += -O4
 opt: LDFLAGS += -O4
@@ -25,6 +25,9 @@ nth: main_nth.cpp $(OBJ)
 st: main_st.cpp $(OBJ) Queue.h
 	g++ $(DEBUG) $(OBJ)  $(LDFLAGS) $(LIB) -o $@ $<
 
+cth: main_cth.cpp $(OBJ) 
+	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
+	
 test: main_test.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 	
@@ -41,6 +44,6 @@ Snap.o: $(SNAPDIR)/snap/Snap.cpp
 	g++ -c $(CXXFLAGS) $(LIB) $<
 
 clean:
-	rm -f *.o th nth st test *.Err *.gz *.dat
+	rm -f *.o th nth cth st test *.Err *.gz *.dat
 	rm -rf Debug Release
 

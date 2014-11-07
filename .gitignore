@@ -11,6 +11,7 @@ test*
 nth
 th
 st
+cth
 *.dat
 *.txt
 *.gz
