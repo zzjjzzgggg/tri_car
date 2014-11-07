@@ -67,10 +67,9 @@ void ExamMgr::SampleUC(TIntPrV& gV){
 		CheckSocialRelation(TmUsrV, G);
 		TmUsrV.Clr();
 	}
-
 	TIntH TridCntH;
 	for(TBNEGraph::TNodeI ni = UCGSampled->BegDstNI(); ni < UCGSampled->EndDstNI(); ni++){
-		const int card = TSnap::GetNodeTriadsAll(G, ni.GetId());
+		const int card = TSnap::GetNodeTriadsAll<PNEGraph>(G, ni.GetId());
 		TridCntH(card) ++;
 	}
 	gV.Clr();
@@ -79,6 +78,7 @@ void ExamMgr::SampleUC(TIntPrV& gV){
 		if (card>=0 && card<=W) gV.Add(TIntPr(card, freq));
 	}
 }
+
 
 void ExamMgr::CheckSocialRelation(const TIntPrV& TmUsrs, PNEGraph& G){
 	TRnd rnd;

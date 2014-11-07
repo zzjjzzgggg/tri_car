@@ -5,10 +5,6 @@
  *      Author: jzzhao
  */
 
-#include <thread>
-#include <mutex>
-#include <vector>
-
 #include "stdafx.h"
 #include "TCEM.h"
 #include "ExamMgr.h"
@@ -75,14 +71,13 @@ int main(int argc, char* argv[]){
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", std::thread::hardware_concurrency(), "Cores to use");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
 	if (Env.IsEndOfRun()) return 0;
 
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt, TrimTail);
+	ExamMgr ExM(GFNm, W, Pe, Rpt, TrimTail);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;

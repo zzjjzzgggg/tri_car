@@ -5,10 +5,6 @@
  *      Author: jzzhao
  */
 
-#include <thread>
-#include <mutex>
-#include <vector>
-
 #include "stdafx.h"
 #include "TCEMGeneral.h"
 #include "ExamMgr.h"
@@ -74,10 +70,9 @@ void em_multi(ExamMgr& ExM){
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
-	const TStr GFNm = Env.GetIfArgPrefixStr("-uc:", "uc.graph", "User-cont interaction graph");
-	const TStr FGFNm = Env.GetIfArgPrefixStr("-fg:", "fg.graph", "Follower graph");
+	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "uc.graph", "User-cont interaction graph");
+	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "fg.graph", "Follower graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", std::thread::hardware_concurrency(), "Cores to use");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-pe:", 0.1, "Edge sampling rate");
 	const double Pr = Env.GetIfArgPrefixFlt("-pr:", 0.1, "Relation sampling rate");
@@ -85,7 +80,7 @@ int main(int argc, char* argv[]){
 	if (Env.IsEndOfRun())  return 0;
 
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, FGFNm, CPU, W, Pe, Pr, Rpt, TrimTail);
+	ExamMgr ExM(GFNm, FGFNm, W, Pe, Pr, Rpt, TrimTail);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;

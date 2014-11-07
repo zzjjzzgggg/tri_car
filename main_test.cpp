@@ -297,7 +297,6 @@ int main(int argc, char* argv[]){
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
 	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "test.graph", "Follower graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", 8, "Cores to use, max=8");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const double Pr = Env.GetIfArgPrefixFlt("-q:", 0.1, "Relation sampling rate");
@@ -306,7 +305,7 @@ int main(int argc, char* argv[]){
 
 	TExeTm tm;
 //	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-	ExamMgr ExM(GFNm, FGFNm, CPU, W, Pe, Pr, Rpt, TrimTail);
+	ExamMgr ExM(GFNm, FGFNm, W, Pe, Pr, Rpt, TrimTail);
 	TIntPrV gV;
 	ExM.SampleUC(gV);
 	printf("Cost time: %s.\n", tm.GetStr());

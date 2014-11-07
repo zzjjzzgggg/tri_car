@@ -6,10 +6,7 @@
  */
 
 #include <queue>
-#include <mutex>
 #include <condition_variable>
-#include <vector>
-#include <thread>
 
 #include "stdafx.h"
 #include "Queue.h"
@@ -29,6 +26,7 @@ void sub_gt(const int id, Queue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 	}
 	printf("[%d] costs time: %s\n", id, tm.GetStr());
 }
+
 
 void multi_groundtruth(ExamMgr& ExM){
 	TExeTm tm;
@@ -62,9 +60,24 @@ void multi_groundtruth(ExamMgr& ExM){
 	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
 	fprintf(fw, "# Nodes: %d\n", ExM.N);
 	for (int i=0; i<TriadCntV.Len(); i++) {
-		int card = TriadCntV[i].Val1;
-		int freq = TriadCntV[i].Val2;
-		double prob = freq/(double)ExM.N;
+		const int card = TriadCntV[i].Val1, freq = TriadCntV[i].Val2;
+		const double prob = freq/(double)ExM.N;
+		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
+	}
+	fclose(fw);
+}
+
+void UC_groundtruth(ExamMgr& ExM){
+	TExeTm tm;
+	TIntPrV gV;
+	ExM.SampleUC(gV);
+	gV.Sort();
+	FILE* fw=fopen(ExM.GetGTFNm().CStr(), "w");
+	fprintf(fw, "# Time cost: %.2f seconds\n", tm.GetSecs());
+	fprintf(fw, "# Nodes: %d\n", ExM.N);
+	for (int i=0; i<gV.Len(); i++) {
+		const int card = gV[i].Val1, freq = gV[i].Val2;
+		const double prob = freq/(double)ExM.N;
 		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
 	}
 	fclose(fw);
@@ -88,18 +101,26 @@ int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
-	const int CPU = Env.GetIfArgPrefixInt("-n:", std::thread::hardware_concurrency(), "Cores to use");
+	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "fg.graph", "Follower graph");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
-	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth (multi-core)"
+				"\n\tc: get UC groundtruth (simple)"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
+
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-	if (Fmts.SearchCh('g') != -1) multi_groundtruth(ExM);
-	if (Fmts.SearchCh('e') != -1) eval_efficiency(ExM);
+	if (Fmts.SearchCh('g') != -1) {
+		ExamMgr ExM(GFNm);
+		multi_groundtruth(ExM);
+	} else if (Fmts.SearchCh('e') != -1) {
+		ExamMgr ExM(GFNm);
+		ExM.Rpt = Rpt;
+		eval_efficiency(ExM);
+	} else if (Fmts.SearchCh('c') != -1) {
+		ExamMgr ExM(GFNm, FGFNm);
+		UC_groundtruth(ExM);
+	}
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }
