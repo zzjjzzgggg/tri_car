@@ -119,6 +119,7 @@ int main(int argc, char* argv[]){
 		eval_efficiency(ExM);
 	} else if (Fmts.SearchCh('c') != -1) {
 		ExamMgr ExM(GFNm, FGFNm);
+		ExM.PEdge = ExM.PRelation = 1;
 		UC_groundtruth(ExM);
 	}
 	printf("Cost time: %s.\n", tm.GetStr());
