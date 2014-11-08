@@ -81,6 +81,7 @@ void UC_groundtruth(ExamMgr& ExM){
 		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
 	}
 	fclose(fw);
+	printf("Saved to %s\n", ExM.GetGTFNm().CStr());
 }
 
 void eval_efficiency(ExamMgr& ExM){
