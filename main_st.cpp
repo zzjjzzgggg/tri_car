@@ -42,7 +42,6 @@ void multi_groundtruth(ExamMgr& ExM){
 	for(std::thread& t: threads) t.join();
 
 	// collect results
-	printf("Saving...\n");
 	PSOut tz = TZipOut::New(ExM.GetNTFNm());
 	tz->PutStrLn(TStr::Fmt("# Nodes: %d", ExM.N));
 	TIntH TriadCntH;
@@ -67,6 +66,7 @@ void multi_groundtruth(ExamMgr& ExM){
 	fclose(fw);
 }
 
+
 void UC_groundtruth(ExamMgr& ExM){
 	TExeTm tm;
 	TIntPrV gV;
@@ -81,8 +81,15 @@ void UC_groundtruth(ExamMgr& ExM){
 		fprintf(fw, "%d\t%d\t%.6e\n", card, freq, prob);
 	}
 	fclose(fw);
-	printf("Saved to %s\n", ExM.GetGTFNm().CStr());
 }
+
+
+void samle_graph(ExamMgr& ExM){
+	PNEGraph G = PNEGraph::TObj::New();
+	ExM.GetSampledGraph(G);
+	TSnap::SaveEdgeList<PNEGraph>(G, ExM.GetSGFNm());
+}
+
 
 void eval_efficiency(ExamMgr& ExM){
 	TIntPrV tridCnt;
@@ -104,9 +111,11 @@ int main(int argc, char* argv[]){
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
 	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "fg.graph", "Follower graph");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
+	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth (multi-core)"
 				"\n\tc: get UC groundtruth (simple)"
+				"\n\ts: get sampled graph"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
 
@@ -114,6 +123,7 @@ int main(int argc, char* argv[]){
 	if (Fmts.SearchCh('g') != -1) {
 		ExamMgr ExM(GFNm);
 		multi_groundtruth(ExM);
+		printf("Saved to\n  %s\n  %s\n", ExM.GetGTFNm().CStr(), ExM.GetNTFNm().CStr());
 	} else if (Fmts.SearchCh('e') != -1) {
 		ExamMgr ExM(GFNm);
 		ExM.Rpt = Rpt;
@@ -122,6 +132,12 @@ int main(int argc, char* argv[]){
 		ExamMgr ExM(GFNm, FGFNm);
 		ExM.PEdge = ExM.PRelation = 1;
 		UC_groundtruth(ExM);
+		printf("Saved to %s\n", ExM.GetGTFNm().CStr());
+	} else if (Fmts.SearchCh('s') != -1) {
+		ExamMgr ExM(GFNm);
+		ExM.PEdge = Pe;
+		samle_graph(ExM);
+		printf("Saved to %s\n", ExM.GetSGFNm().CStr());
 	}
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;

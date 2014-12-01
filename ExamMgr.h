@@ -24,27 +24,27 @@ public:
 private:
 	void CheckSocialRelation(const TIntPrV& Users, PNEGraph& G);
 public:
-	ExamMgr(const TStr& GFnm, const int w=10000, const double Pe=0.1,
-			const int NRpt=12, const bool Tail=false): GFNm(GFnm),
-			FGFNm(""), W(w), Rpt(NRpt), PEdge(Pe), PRelation(0), TrimTail(Tail){
+	ExamMgr(const TStr& GFnm, const int w=10000, const double Pe=0.1, const int NRpt=12,
+			const bool Tail=false): GFNm(GFnm), FGFNm(""), W(w), Rpt(NRpt), PEdge(Pe),
+			PRelation(0), TrimTail(Tail){
 		CPU = std::thread::hardware_concurrency();
 		GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
 		N = GFull->GetNodes();
 	}
+
 	/**
 	 * NC is the number of OSN content
 	 */
-	ExamMgr(const TStr& UCGFnm, const TStr& FGFnm, const int w=10000,
-			const double Pe=0.1, const double Pr=0.1, const int NRpt=12,
-			const bool Tail=false): GFNm(UCGFnm), FGFNm(FGFnm), W(w), Rpt(NRpt),
-					PEdge(Pe), PRelation(Pr), TrimTail(Tail){
+	ExamMgr(const TStr& UCGFnm, const TStr& FGFnm, const int w=10000, const double Pe=0.1,
+			const double Pr=0.1, const int NRpt=12, const bool Tail=false): GFNm(UCGFnm),
+					FGFNm(FGFnm), W(w), Rpt(NRpt),PEdge(Pe), PRelation(Pr), TrimTail(Tail){
 		CPU = std::thread::hardware_concurrency();
 		UCGFull = TSnap::LoadBNEGraph(UCGFnm);
 		FGFull = TSnap::LoadEdgeList<PNGraph>(FGFnm);
 		N = UCGFull->GetDstNodes();
 	}
-	void GetSampledGraph(PNEGraph& G, const double Pe=-1);
 
+	void GetSampledGraph(PNEGraph& G, const double Pe=-1);
 	void Sample(TIntPrV& gV, const double Pe=-1);
 	void SampleUC(TIntPrV& gV);
 
@@ -59,6 +59,9 @@ public:
 	}
 	TStr GetNTFNm() const {
 		return GFNm.GetFPath() + TStr::Fmt("ndtriads_%s.gz", GFNm.GetFMid().CStr());
+	}
+	TStr GetSGFNm() const {
+		return GFNm.GetFPath() + TStr::Fmt("%s_p%g.gz", GFNm.GetFMid().CStr(), PEdge);
 	}
 	int GetRpt() const { return CPU*Rpt; }
 	double GetPdUU() const { return pow(PEdge, 3); }

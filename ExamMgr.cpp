@@ -12,11 +12,12 @@ void ExamMgr::GetSampledGraph(PNEGraph& G, const double Pe){
 	TRnd rnd;
 	G->Clr();
 	for(EI ei=GFull->BegEI(); ei!=GFull->EndEI(); ei++){
-		if(rnd.GetUniDev() > p) continue;
-		const int src = ei.GetSrcNId(), dst = ei.GetDstNId();
-		if(!G->IsNode(src)) G->AddNode(src);
-		if(!G->IsNode(dst)) G->AddNode(dst);
-		G->AddEdge(src, dst);
+		if(rnd.GetUniDev() <= p) {
+			const int src = ei.GetSrcNId(), dst = ei.GetDstNId();
+			if(!G->IsNode(src)) G->AddNode(src);
+			if(!G->IsNode(dst)) G->AddNode(dst);
+			G->AddEdge(src, dst);
+		}
 	}
 	G->Defrag();
 }
