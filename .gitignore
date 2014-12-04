@@ -3,13 +3,11 @@
 .settings/
 *.o
 *.Err
-main
-main_th
-main_st
-main_nth
 test*
 nth
 th
+beta_nth
+beta_th
 st
 cth
 *.dat
