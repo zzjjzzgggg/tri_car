@@ -6,8 +6,7 @@
 test*
 nth
 th
-beta_nth
-beta_th
+beta_*
 st
 cth
 *.dat
