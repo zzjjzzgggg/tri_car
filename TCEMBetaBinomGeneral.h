@@ -30,7 +30,7 @@ private:
 //	double GetA(const int i, const int j) const { return TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd)); }
 //	double GetQ(const int i) const { return TSpecFunc::Binomial(0, i, Pd); }
 	void EStep();
-	bool MStep_theta(const double Eps=0.001);
+	bool MStep_theta(const double Eps=0.002);
 	bool MStep_alpha(const double Eps=0.0001, const int MxNewtonIters = 100);
 	void Scale();
 public:
