@@ -11,15 +11,16 @@
  * update [z_ij]
  */
 void TCEMBetaBinom::EStep(){
+	TInt j, gj;
 	NonZeroZV.Clr();
 	for (int id=0; id<gV.Len(); id++){
-		const int j = gV[id].Val1, freq = gV[id].Val2;
+		gV[id].GetVal(j, gj);
 		double norm = 0;
 		for (int i=j; i<=W; i++){
 			const int k = Idx(i,j);
 			ZV[k] = ThV[i]*TSpecFunc::BetaBinomial(j, i, Pd/alpha, (1-Pd)/alpha);
 			norm += ZV[k];
-			ZV[k] *= freq;
+			ZV[k] *= gj;
 		}
 		for (int i=j; i<=W; i++){
 			const int k = Idx(i,j);

@@ -11,17 +11,16 @@
 #include "stdafx.h"
 
 /**
- * For the case N is given, and P(Y=j|X=i) is modeled by a beta binomial distribution.
+ * For the case N is not given
  */
 class TCEMBetaBinomGeneral {
 private:
-	int W, g;
-	double Pd;  /// p == p_delta
+	int W, M, g, BoundW;
+	double Pd;
 	TFltV ZV, ThV_pre;
 	TIntIntFltTrV NonZeroZV;
 	TIntPrV gV;
 public:
-	int M, Iters;
 	double alpha;
 	TFltV ThV;
 private:
@@ -30,13 +29,13 @@ private:
 	double GetQ(const int i) const { return TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha); }
 //	double GetA(const int i, const int j) const { return TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd)); }
 //	double GetQ(const int i) const { return TSpecFunc::Binomial(0, i, Pd); }
-	void EStep(const int MinW=100);
+	void EStep();
 	bool MStep_theta(const double Eps=0.005);
 	bool MStep_alpha(const double Eps=0.0001, const int MxNewtonIters = 100);
 	void Scale();
 public:
-	TCEMBetaBinomGeneral(const int W, const double p_delta, const TIntPrV& igV):
-		W(W), Pd(p_delta), Iters(0), alpha(0.001) {
+	TCEMBetaBinomGeneral(const int W, const int BW, const double Pd, const double alpha, const TIntPrV& igV):
+		W(W), BoundW(BW), Pd(Pd), alpha(alpha) {
 		M = g = 0;
 		for (int id=0; id<igV.Len(); id++) {
 			const int card = igV[id].Val1, freq = igV[id].Val2;

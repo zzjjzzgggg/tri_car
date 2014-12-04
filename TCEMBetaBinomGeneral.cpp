@@ -10,12 +10,12 @@
 /**
  * update [z_ij]
  */
-void TCEMBetaBinomGeneral::EStep(const int MinW){
-	int i, j, k, gj; double norm;
+void TCEMBetaBinomGeneral::EStep(){
+	TInt i, j, k, gj;
+	double norm;
 	NonZeroZV.Clr();
 	for (int id=0; id<gV.Len(); id++){
-		j = gV[id].Val1;
-		gj = gV[id].Val2;
+		gV[id].GetVal(j, gj);
 		norm = 0;
 		for (i=j; i<=W; i++){
 			k = Idx(i,j);
@@ -25,7 +25,7 @@ void TCEMBetaBinomGeneral::EStep(const int MinW){
 		for (i=j; i<=W; i++){
 			k = Idx(i,j);
 			ZV[k] = norm<1E-9 ? 0 : gj*ZV[k]/norm;
-			if (i<=MinW && ZV[k]>1E-9) NonZeroZV.Add(TIntIntFltTr(i,j,ZV[k]));
+			if (i<=BoundW && ZV[k]>1E-9) NonZeroZV.Add(TIntIntFltTr(i,j,ZV[k]));
 		}
 	}
 }
@@ -62,7 +62,7 @@ bool TCEMBetaBinomGeneral::MStep_theta(const double Eps){
  * to speed up the estimation of alpha, we do not need handle nodes with i>MinW.
  */
 bool TCEMBetaBinomGeneral::MStep_alpha(const double Eps, const int MxNewtonIters) {
-	TInt i, j, cnt=0; Iters = 0;
+	TInt i, j, cnt=0;
 	TFlt dQ, ddQ, e1, e2, e, z, a, da, q, dq, ddq, alpha_pre = alpha+1;
 	// Newton iterations
 	while (fabs(alpha_pre - alpha) > Eps && cnt < MxNewtonIters) {
@@ -84,11 +84,9 @@ bool TCEMBetaBinomGeneral::MStep_alpha(const double Eps, const int MxNewtonIters
 			dQ += z * ( e1 + dq/(1-q) );
 			ddQ += z * ( e2 + pow(dq/(1-q), 2) + ddq/(1-q) );
 		}
-//		if (fabs(dQ)<1E-9) return true;
-//		Assert(fabs(ddQ)>1E-9);
 		alpha_pre = alpha;
 		alpha -= dQ/ddQ;
-		cnt++; Iters++;
+		cnt++;
 	}
 	return cnt<MxNewtonIters;
 }
@@ -97,26 +95,19 @@ bool TCEMBetaBinomGeneral::MStep_alpha(const double Eps, const int MxNewtonIters
  * EM iterations
  */
 bool TCEMBetaBinomGeneral::Run(const int MxEMIters){
-	printf("Step 1\n");
 	for (int iters=0; iters<MxEMIters; iters++){
 		EStep();
 		if (MStep_theta()) break;
 	}
-	printf("Step 2\n");
 	for (int iters=0; iters<MxEMIters; iters++){
 		EStep();
-		printf("Update alpha ... "); fflush(stdout);
-		if (MStep_alpha()) printf("Yes. alpha = %.4f iters = %d\n", alpha, Iters);
-		else printf("No.\n");
-		if (MStep_theta()) {
+		if (MStep_alpha() && MStep_theta()) {
 			Scale();
 			return true;
 		}
 	}
 	return false;
 }
-
-
 
 void TCEMBetaBinomGeneral::Scale(){
 	ThV[0] = 0;

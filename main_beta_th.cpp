@@ -65,7 +65,7 @@ void em_multi(ExamMgr& ExM){
 	const TStr OFnm = ExM.GetBTHFNm();
 	BIO::SaveFltVWithIdx(ThVs[0], OFnm,
 		TStr::Fmt("# Nodes: %d\n# Repeated: %d. \n# Avg time cost: %.2f secs.\n# Alpha: %.6e",
-				ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt(), Alphas[0].Val));
+			ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt(), Alphas[0].Val));
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
