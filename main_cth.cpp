@@ -74,13 +74,15 @@ int main(int argc, char* argv[]){
 	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "fg.graph", "Follower graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 12, "Repeat");
+	const int CPU = Env.GetIfArgPrefixInt("-cpu:", std::thread::hardware_concurrency(), "# of CPUs");
 	const double Pe = Env.GetIfArgPrefixFlt("-pe:", 0.1, "Edge sampling rate");
 	const double Pr = Env.GetIfArgPrefixFlt("-pr:", 0.1, "Relation sampling rate");
 	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
 	if (Env.IsEndOfRun())  return 0;
 
+	ExamMgr ExM;
 	TExeTm2 tm;
-	ExamMgr ExM(GFNm, FGFNm, W, Pe, Pr, Rpt, TrimTail);
+	ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetW(W).SetPEdge(Pe).SetPSocial(Pr).SetRepeat(Rpt).SetCPU(CPU).IsTrimTail(TrimTail);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;

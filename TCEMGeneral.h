@@ -17,7 +17,7 @@ class TCEMGeneral {
 private:
 	int W, g;
 	double Pd;  /// p == p_delta
-	TFltV AV, ZV, ThV_pre;
+	TFltV AV, ZV;
 	TIntPrV gV;
 public:
 	int M, Iters;
@@ -41,8 +41,17 @@ public:
 				AV[Idx(i,j)] = TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd));
 		}
 		// init Theta
-		ThV.Gen(W+1); ThV_pre.Gen(W+1);
+		ThV.Gen(W+1);
 		TRandom::InitUni(ThV, 1);
+
+//		TRnd Rnd;
+//		double norm = 0;
+//		for (int i=1; i<=W; i++) {
+//			ThV[i] = pow(i, -Rnd.GetUniDev()*0.4-0.8);
+//			norm += ThV[i];
+//		}
+//		for (int i=1; i<=W; i++) ThV[i] /= norm;
+
 		// space for Z
 		ZV.Gen((M+1)*(2*W-M+2)/2);
 	};

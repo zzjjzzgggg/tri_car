@@ -285,12 +285,51 @@ void spam_friend(const int R){
 	BIO::SaveIntFltKdV(klV, Root+"KL_friend.dat");
 }
 
+///////////////////////////////////////////////////////
+void test_convergence(){
+	int i, j, cnt=0;
+	double dQ, ddQ, z, e1, e2, e, alpha=1, alpha_pre = alpha+1, Pd = 0.281;
+
+	TIntIntFltTrV NonZeroZV;
+	NonZeroZV.Add(TIntIntFltTr(1,0,36)); NonZeroZV.Add(TIntIntFltTr(1,1,12));
+	NonZeroZV.Add(TIntIntFltTr(2,0,15)); NonZeroZV.Add(TIntIntFltTr(2,1,7)); NonZeroZV.Add(TIntIntFltTr(2,2,1));
+	NonZeroZV.Add(TIntIntFltTr(3,0,5)); NonZeroZV.Add(TIntIntFltTr(3,1,7)); NonZeroZV.Add(TIntIntFltTr(3,2,3));
+	NonZeroZV.Add(TIntIntFltTr(3,3,2));
+	NonZeroZV.Add(TIntIntFltTr(4,0,3)); NonZeroZV.Add(TIntIntFltTr(4,1,3)); NonZeroZV.Add(TIntIntFltTr(4,2,1));
+	NonZeroZV.Add(TIntIntFltTr(6,0,1)); NonZeroZV.Add(TIntIntFltTr(6,2,1)); NonZeroZV.Add(TIntIntFltTr(6,3,1));
+	NonZeroZV.Add(TIntIntFltTr(6,4,1)); NonZeroZV.Add(TIntIntFltTr(6,6,1));
+	// Newton iterations
+	while (fabs(alpha_pre - alpha) > 0.0001 && cnt < 100) {
+		dQ = ddQ = 0;
+		for (int id=0; id < NonZeroZV.Len(); id++){
+			i = NonZeroZV[id].Val1;
+			j = NonZeroZV[id].Val2;
+			z = NonZeroZV[id].Val3;
+			e1 = e2 = 0;
+			for (int s = 0; s < i; s++) {
+				if (s < j) e = s/(s*alpha+Pd);
+				else e = (s-j)/((s-j)*alpha+1-Pd);
+				e1 += e - s/(s*alpha+1);
+				e2 += -e*e + pow(s/(s*alpha+1), 2);
+			}
+			dQ += z*e1;
+			ddQ += z*e2;
+		}
+		alpha_pre = alpha;
+		alpha -= dQ/ddQ;
+		cnt++;
+	}
+	printf("%d, alpha=%.4f\n", cnt,alpha);
+}
 
 int main(int argc, char* argv[]){
 //	dist_triangles(22);
 //	spam_rnd(10);
 //	spam_friend(10);
-//	return 0;
+
+
+	test_convergence();
+	return 0;
 
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
@@ -305,9 +344,9 @@ int main(int argc, char* argv[]){
 
 	TExeTm tm;
 //	ExamMgr ExM(GFNm, CPU, W, Pe, Rpt);
-	ExamMgr ExM(GFNm, FGFNm, W, Pe, Pr, Rpt, TrimTail);
-	TIntPrV gV;
-	ExM.SampleUC(gV);
+//	ExamMgr ExM;
+//	TIntPrV gV;
+//	ExM.SampleUC(gV);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
 }

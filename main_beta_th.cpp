@@ -6,22 +6,20 @@
  */
 
 #include "stdafx.h"
-#include "TCEM.h"
+#include "TCEMBetaBinom.h"
 #include "ExamMgr.h"
 
 
 void em_sub(const int id, ExamMgr& ExM, TFltV& ThV){
 	int NSuc = 0; TIntPrV gV;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
-		printf("rpt = %d\n", rpt);
+		printf("[%d] rpt = %d\n", id, rpt);
 		ExM.Sample(gV);
-		TCEM EM(ExM.W, ExM.N, ExM.GetPdUU(), gV);
-		printf("[%d] M: %d\n", id, EM.M);
+		TCEMBetaBinom EM(ExM.W, ExM.N, ExM.BoundW, ExM.GetPdUU(), ExM.alpha, gV);
 		if (EM.Run()) {
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
 			NSuc++;
 		}
-//		printf("[%d] EM: %d\n", id, EM.Iters);
 	}
 	for (int i=0; i<ThV.Len(); i++) ThV[i] /= NSuc;
 	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);
@@ -60,26 +58,29 @@ void em_multi(ExamMgr& ExM){
 		ThVs[0][i] /= ExM.CPU;
 	}
 	if (ExM.TrimTail) trim_tail(ExM, ThVs[0]);
-	const TStr OFnm = ExM.GetTHFNm();
-	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Nodes: %d\n# Repeated: %d. \n# Avg time cost: %.2f secs.", ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt()));
+	const TStr OFnm = ExM.GetBTHFNm();
+	BIO::SaveFltVWithIdx(ThVs[0], OFnm,
+		TStr::Fmt("# Nodes: %d\n# Repeated: %d. \n# Avg time cost: %.2f secs.\n# Alpha: %.3f",
+				ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt(), 0));
 	printf("Saved to %s\n", OFnm.CStr());
 }
-
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "", "Input graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
+	const int BW = Env.GetIfArgPrefixInt("-bw:", 100, "W upper bound");
 	const int CPU = Env.GetIfArgPrefixInt("-cpu:", std::thread::hardware_concurrency(), "# of CPUs");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 100/CPU, "Repeat times");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
+	const double alpha = Env.GetIfArgPrefixFlt("-alpha:", 0.0001, "alpha");
 	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
-	if (Env.IsEndOfRun()) return 0;
+	if (Env.IsEndOfRun())  return 0;
 
 	TExeTm2 tm;
 	ExamMgr ExM;
-	ExM.SetActionGraph(GFNm).SetW(W).SetPEdge(Pe).SetRepeat(Rpt).SetCPU(CPU).IsTrimTail(TrimTail);
+	ExM.SetActionGraph(GFNm).SetW(W).SetPEdge(Pe).SetRepeat(Rpt).SetCPU(CPU).IsTrimTail(TrimTail).SetBoundW(BW).SetAlpha(alpha);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;

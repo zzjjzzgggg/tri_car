@@ -111,6 +111,7 @@ int main(int argc, char* argv[]){
 	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "test.graph", "Input graph");
 	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "fg.graph", "Follower graph");
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
+	const int CPU = Env.GetIfArgPrefixInt("-cpu:", std::thread::hardware_concurrency(), "# of CPUs");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth (multi-core)"
@@ -118,24 +119,21 @@ int main(int argc, char* argv[]){
 				"\n\ts: get sampled graph"
 				"\n\te: compare efficiency");
 	if (Env.IsEndOfRun()) return 0;
-
+	ExamMgr ExM;
 	TExeTm2 tm;
 	if (Fmts.SearchCh('g') != -1) {
-		ExamMgr ExM(GFNm);
+		ExM.SetActionGraph(GFNm).SetCPU(CPU);
 		multi_groundtruth(ExM);
 		printf("Saved to\n  %s\n  %s\n", ExM.GetGTFNm().CStr(), ExM.GetNTFNm().CStr());
 	} else if (Fmts.SearchCh('e') != -1) {
-		ExamMgr ExM(GFNm);
-		ExM.Rpt = Rpt;
+		ExM.SetActionGraph(GFNm).SetRepeat(Rpt);
 		eval_efficiency(ExM);
 	} else if (Fmts.SearchCh('c') != -1) {
-		ExamMgr ExM(GFNm, FGFNm);
-		ExM.PEdge = ExM.PRelation = 1;
+		ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetPEdge(1).SetPSocial(1);
 		UC_groundtruth(ExM);
 		printf("Saved to %s\n", ExM.GetGTFNm().CStr());
 	} else if (Fmts.SearchCh('s') != -1) {
-		ExamMgr ExM(GFNm);
-		ExM.PEdge = Pe;
+		ExM.SetActionGraph(GFNm).SetPEdge(Pe);
 		samle_graph(ExM);
 		printf("Saved to %s\n", ExM.GetSGFNm().CStr());
 	}

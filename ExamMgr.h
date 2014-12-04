@@ -18,54 +18,53 @@ public:
 	PBNEGraph UCGFull;
 	PNGraph FGFull;
 	TStr GFNm, FGFNm;
-	int N, W, CPU, Rpt;
-	double PEdge, PRelation;
+	int N, W, CPU, Rpt, BoundW;
+	double PEdge, PSocial, alpha;
 	bool TrimTail;
 private:
 	void CheckSocialRelation(const TIntPrV& Users, PNEGraph& G);
 public:
-	ExamMgr(const TStr& GFnm, const int w=10000, const double Pe=0.1, const int NRpt=12,
-			const bool Tail=false): GFNm(GFnm), FGFNm(""), W(w), Rpt(NRpt), PEdge(Pe),
-			PRelation(0), TrimTail(Tail){
-		CPU = std::thread::hardware_concurrency();
-		GFull = TSnap::LoadEdgeList<PNEGraph>(GFnm);
-		N = GFull->GetNodes();
-	}
+	ExamMgr(): GFNm(""), FGFNm(""), N(0), W(10000), CPU(1), Rpt(12), BoundW(100),
+		PEdge(0.1), PSocial(0.1), alpha(0.0001),
+		TrimTail(false) {}
 
-	/**
-	 * NC is the number of OSN content
-	 */
-	ExamMgr(const TStr& UCGFnm, const TStr& FGFnm, const int w=10000, const double Pe=0.1,
-			const double Pr=0.1, const int NRpt=12, const bool Tail=false): GFNm(UCGFnm),
-					FGFNm(FGFnm), W(w), Rpt(NRpt),PEdge(Pe), PRelation(Pr), TrimTail(Tail){
-		CPU = std::thread::hardware_concurrency();
-		UCGFull = TSnap::LoadBNEGraph(UCGFnm);
-		FGFull = TSnap::LoadEdgeList<PNGraph>(FGFnm);
-		N = UCGFull->GetDstNodes();
+	// method chaining
+	// for user-content interaction, set social graph first.
+	ExamMgr& SetActionGraph(const TStr& GFNm) {
+		this->GFNm = GFNm;
+		if (FGFNm.Len()==0) { // if social graph is not set
+			GFull = TSnap::LoadEdgeList<PNEGraph>(GFNm);
+			N = GFull->GetNodes();
+		} else {
+			UCGFull = TSnap::LoadBNEGraph(GFNm);
+			N = UCGFull->GetDstNodes();
+		}
+		return *this;
 	}
+	ExamMgr& SetSocialGraph(const TStr& GFNm) { FGFNm=GFNm; FGFull = TSnap::LoadEdgeList<PNGraph>(FGFNm); return *this; }
+	ExamMgr& SetCPU(const int& nCPU) { this->CPU = nCPU; return *this; }
+	ExamMgr& SetW(const int& W) { this->W = W; return *this; }
+	ExamMgr& SetRepeat(const int& Rpt) { this->Rpt = Rpt; return *this; }
+	ExamMgr& SetPEdge(const double& Pe) { this->PEdge = Pe; return *this; }
+	ExamMgr& SetPSocial(const double& Pr) { this->PSocial = Pr; return *this; }
+	ExamMgr& IsTrimTail(const bool& TrimTail) { this->TrimTail = TrimTail; return *this; }
+	ExamMgr& SetBoundW(const int& BW) { this->BoundW = BW; return *this; }
+	ExamMgr& SetAlpha(const double& alpha) { this->alpha = alpha; return *this; }
 
 	void GetSampledGraph(PNEGraph& G, const double Pe=-1);
 	void Sample(TIntPrV& gV, const double Pe=-1);
 	void SampleUC(TIntPrV& gV);
 
-	TStr GetTHFNm() const{
-		return GFNm.GetFPath() + TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge);
-	}
-	TStr GetNTHFNm() const{
-		return GFNm.GetFPath() + TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge);
-	}
-	TStr GetGTFNm() const {
-		return GFNm.GetFPath() + TStr::Fmt("gndtruth_%s.dat", GFNm.GetFMid().CStr());
-	}
-	TStr GetNTFNm() const {
-		return GFNm.GetFPath() + TStr::Fmt("ndtrids_%s.gz", GFNm.GetFMid().CStr());
-	}
-	TStr GetSGFNm() const {
-		return GFNm.GetFPath() + TStr::Fmt("%s_p%g.gz", GFNm.GetFMid().CStr(), PEdge);
-	}
+	TStr GetTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetBTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("bth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetNTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetBNTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("bnth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetGTFNm() const { return GFNm.GetFPath()+TStr::Fmt("gndtruth_%s.dat", GFNm.GetFMid().CStr()); }
+	TStr GetNTFNm() const { return GFNm.GetFPath()+TStr::Fmt("ndtrids_%s.gz", GFNm.GetFMid().CStr()); }
+	TStr GetSGFNm() const { return GFNm.GetFPath()+TStr::Fmt("%s_p%g.gz", GFNm.GetFMid().CStr(), PEdge); }
 	int GetRpt() const { return CPU*Rpt; }
 	double GetPdUU() const { return pow(PEdge, 3); }
-	double GetPdUC() const { return pow(PEdge, 2)*PRelation; }
+	double GetPdUC() const { return pow(PEdge, 2)*PSocial; }
 };
 
 #endif /* EXAMMGR_H_ */

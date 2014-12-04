@@ -79,7 +79,6 @@ void ExamMgr::SampleUC(TIntPrV& gV){
 	}
 }
 
-
 void ExamMgr::CheckSocialRelation(const TIntPrV& TmUsrs, PNEGraph& G){
 	TRnd rnd;
 	const int L = TmUsrs.Len();
@@ -88,7 +87,7 @@ void ExamMgr::CheckSocialRelation(const TIntPrV& TmUsrs, PNEGraph& G){
 		for (int j=i+1; j<L; j++){
 			const int v = TmUsrs[j].Val2;
 			// check whether u <--- v with probability PRelation
-			if (u!=v && rnd.GetUniDev()<=PRelation && FGFull->IsEdge(v, u))
+			if (u!=v && rnd.GetUniDev()<=PSocial && FGFull->IsEdge(v, u))
 				G->AddEdge(v, u);
 		}
 	}

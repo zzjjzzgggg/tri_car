@@ -33,6 +33,7 @@ void TCEMGeneral::EStep(){
  */
 bool TCEMGeneral::MStep(const double Eps){
 	// store the old parameters before we update them
+	TFltV ThV_pre(W+1);
 	for (int i=1; i<=W; i++) {
 		ThV_pre[i] = ThV[i];
 		ThV[i] = 0;
@@ -76,7 +77,7 @@ bool TCEMGeneral::Run(const int max_iter){
 void TCEMGeneral::Scale(){
 	ThV[0] = 0;
 	for (int i=1; i<=W; i++) {
-		ThV[i] /= (1 - TSpecFunc::Binomial(0, i, Pd));
+		ThV[i] /= 1 - TSpecFunc::Binomial(0, i, Pd);
 		ThV[0] += ThV[i];
 	}
 	double qth = 0; // q_theta
