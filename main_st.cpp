@@ -141,7 +141,7 @@ int main(int argc, char* argv[]){
 		multi_groundtruth(ExM);
 		printf("Saved to\n  %s\n  %s\n", ExM.GetGTFNm().CStr(), ExM.GetNTFNm().CStr());
 	} else if (Fmts.SearchCh('e') != -1) {
-		ExM.SetActionGraph(GFNm).SetRepeat(Rpt);
+		ExM.SetActionGraph(GFNm).SetCPU(CPU);
 		multi_eval_efficiency(ExM, PeV);
 		printf("Saved to %s\n", ExM.GetEfFNm().CStr());
 	} else if (Fmts.SearchCh('c') != -1) {
