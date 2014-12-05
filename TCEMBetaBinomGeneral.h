@@ -27,8 +27,6 @@ private:
 	int Idx(const int i, const int j) const { return (i<=M) ? (i*(i+1)/2+j) : ((M+1)*(M+2)/2+(i-M-1)*(M+1)+j); }
 	double GetA(const int i, const int j) const { return TSpecFunc::BetaBinomial(j, i, Pd/alpha, (1-Pd)/alpha) / (1-TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha)); }
 	double GetQ(const int i) const { return TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha); }
-//	double GetA(const int i, const int j) const { return TSpecFunc::Binomial(j, i, Pd)/(1-TSpecFunc::Binomial(0, i, Pd)); }
-//	double GetQ(const int i) const { return TSpecFunc::Binomial(0, i, Pd); }
 	void EStep();
 	bool MStep_theta(const double Eps=0.002);
 	bool MStep_alpha(const double Eps=0.0001, const int MxNewtonIters = 100);

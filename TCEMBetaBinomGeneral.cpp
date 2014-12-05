@@ -34,24 +34,25 @@ void TCEMBetaBinomGeneral::EStep(){
  * update ThV and Nt
  */
 bool TCEMBetaBinomGeneral::MStep_theta(const double Eps){
+	int i, j, k;
 	// store the old parameters before we update them
-	for (int i=1; i<=W; i++) {
+	for (i=1; i<=W; i++) {
 		ThV_pre[i] = ThV[i];
 		ThV[i] = 0;
 	}
 	// now update
 	double norm = 0;
-	for (int id=0; id<gV.Len(); id++){
-		const int j = gV[id].Val1;
-		for(int i=j; i<=W; i++){
-			const int k = Idx(i,j);
+	for (int id=0; id<gV.Len(); id++) {
+		j = gV[id].Val1;
+		for(i=j; i<=W; i++) {
+			k = Idx(i,j);
 			ThV[i] += ZV[k];
 			norm += ZV[k];
 		}
 	}
 	// normalize Thv and calculate diff
 	double diff = 0;
-	for (int i=1; i<=W; i++) {
+	for (i=1; i<=W; i++) {
 		ThV[i] /= norm;
 		diff += fabs(ThV[i] - ThV_pre[i]);
 	}
