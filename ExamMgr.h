@@ -55,14 +55,14 @@ public:
 	void Sample(TIntPrV& gV, const double Pe=-1);
 	void SampleUC(TIntPrV& gV);
 
-	TStr GetTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
-	TStr GetBTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("bth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
-	TStr GetNTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
-	TStr GetBNTHFNm() const{ return GFNm.GetFPath()+TStr::Fmt("bnth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetBTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("bth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetNTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
+	TStr GetBNTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("bnth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
 	TStr GetGTFNm() const { return GFNm.GetFPath()+TStr::Fmt("gndtruth_%s.dat", GFNm.GetFMid().CStr()); }
 	TStr GetNTFNm() const { return GFNm.GetFPath()+TStr::Fmt("ndtrids_%s.gz", GFNm.GetFMid().CStr()); }
 	TStr GetSGFNm() const { return GFNm.GetFPath()+TStr::Fmt("%s_p%g.gz", GFNm.GetFMid().CStr(), PEdge); }
-	TStr GetEfFNm() const { return GFNm.GetFPath()+TStr::Fmt("eff_%s.gz", GFNm.GetFMid().CStr()); }
+	TStr GetEfFNm() const { return GFNm.GetFPath()+TStr::Fmt("eff_%s.dat", GFNm.GetFMid().CStr()); }
 	int GetRpt() const { return CPU*Rpt; }
 	double GetPdUU() const { return pow(PEdge, 3); }
 	double GetPdUC() const { return pow(PEdge, 2)*PSocial; }
