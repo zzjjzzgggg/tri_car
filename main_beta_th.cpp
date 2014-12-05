@@ -28,7 +28,7 @@ void em_sub(const int id, ExamMgr& ExM, TFlt& alpha, TFltV& ThV){
 }
 
 void trim_tail(ExamMgr& ExM, TFltV& ThV){
-	double minval=1, Pd = pow(ExM.PEdge,3);
+	double minval=1, Pd = ExM.GetPdUU();
 	int Wp=1;
 	for (int i=0; i<=ExM.W; i++) {
 		if (ThV[i] < minval){
@@ -36,15 +36,12 @@ void trim_tail(ExamMgr& ExM, TFltV& ThV){
 			Wp = i;
 		}
 	}
-	double qth = 0, rem = 0; // q_theta
+	double rem = 0; // q_theta
 	for (int i=Wp+1; i<=ExM.W; i++) {
 		rem += ThV[i];
 		ThV[i] = 0;
 	}
-	for (int i=0; i<=Wp; i++){
-		ThV[i] /= (1-rem);
-		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
-	}
+	for (int i=0; i<=Wp; i++) ThV[i] /= (1-rem);
 	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
 }
 

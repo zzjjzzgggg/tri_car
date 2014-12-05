@@ -62,6 +62,7 @@ public:
 	TStr GetGTFNm() const { return GFNm.GetFPath()+TStr::Fmt("gndtruth_%s.dat", GFNm.GetFMid().CStr()); }
 	TStr GetNTFNm() const { return GFNm.GetFPath()+TStr::Fmt("ndtrids_%s.gz", GFNm.GetFMid().CStr()); }
 	TStr GetSGFNm() const { return GFNm.GetFPath()+TStr::Fmt("%s_p%g.gz", GFNm.GetFMid().CStr(), PEdge); }
+	TStr GetEfFNm() const { return GFNm.GetFPath()+TStr::Fmt("eff_%s.gz", GFNm.GetFMid().CStr()); }
 	int GetRpt() const { return CPU*Rpt; }
 	double GetPdUU() const { return pow(PEdge, 3); }
 	double GetPdUC() const { return pow(PEdge, 2)*PSocial; }

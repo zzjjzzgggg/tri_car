@@ -27,24 +27,25 @@ void em_sub(const int id, ExamMgr& ExM, TFlt& alpha, TFltV& ThV){
 	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);
 }
 
-void trim_tail(ExamMgr& ExM, TFltV& ThV){
-	double minval=1, Pd = pow(ExM.PEdge,3);
+void trim_tail(ExamMgr& ExM, TFltV& ThV, const double alpha){
+	double minval=1, Pd = ExM.GetPdUU(), qth=0, qth_new = 0, rem = 0; // q_theta
 	int Wp=1;
-	for (int i=0; i<=ExM.W; i++) {
+	for (int i=1; i<=ExM.W; i++) {
+		qth += ThV[i]*TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha);
 		if (ThV[i] < minval){
 			minval = ThV[i];
 			Wp = i;
 		}
 	}
-	double qth = 0, rem = 0; // q_theta
 	for (int i=Wp+1; i<=ExM.W; i++) {
 		rem += ThV[i];
 		ThV[i] = 0;
 	}
-	for (int i=0; i<=Wp; i++){
+	for (int i=1; i<=Wp; i++){
 		ThV[i] /= (1-rem);
-		qth += ThV[i]*TSpecFunc::Binomial(0, i, Pd);
+		qth_new += ThV[i]*TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha);
 	}
+	ThV[0] *= (1-qth)/(1-qth_new);
 	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
 }
 
@@ -56,14 +57,14 @@ void em_multi(ExamMgr& ExM){
 	for (int i=0; i<ExM.CPU; i++) threads.emplace_back([i, &ExM, &Alphas, &ThVs] { em_sub(i, ExM, Alphas[i], ThVs[i]); });
 	for(std::thread& t: threads) t.join();
 	for (int n=1; n<ExM.CPU; n++) Alphas[0] += Alphas[n];
+	Alphas[0] /= ExM.CPU;
 	for (int i=0; i<=ExM.W; i++){
 		for (int n=1; n<ExM.CPU; n++) ThVs[0][i] += ThVs[n][i];
 		ThVs[0][i] /= ExM.CPU;
 	}
-	if (ExM.TrimTail) trim_tail(ExM, ThVs[0]);
+	if (ExM.TrimTail) trim_tail(ExM, ThVs[0], Alphas[0]);
 	const TStr OFnm = ExM.GetBNTHFNm();
-	BIO::SaveFltVWithIdx(ThVs[0], OFnm,
-		TStr::Fmt("# Nodes: %d\n# Repeated: %d. \n# Avg time cost: %.2f secs.\n# Alpha: %.6e",
+	BIO::SaveFltVWithIdx(ThVs[0], OFnm, TStr::Fmt("# Nodes: %d\n# Repeated: %d\n# Avg time cost: %.2f secs.\n# Alpha: %.6e",
 			ExM.N, ExM.GetRpt(), tm.GetSecs()/ExM.GetRpt(), Alphas[0].Val));
 	printf("Saved to %s\n", OFnm.CStr());
 }

@@ -91,19 +91,20 @@ void samle_graph(ExamMgr& ExM){
 }
 
 
-void eval_efficiency(ExamMgr& ExM){
+void eval_efficiency(ExamMgr& ExM, TFltV PEdgeV){
 	TIntPrV tridCnt;
 	TExeTm tm;
 	PNEGraph G = PNEGraph::TObj::New();
-	double ps[] = {.1, .15, .2, .25, .3};
-	for (int i=0; i<5; i++){
-		ExM.GetSampledGraph(G, ps[i]);
+	TFltPrV PTmPr;
+	for (int i=0; i<PEdgeV.Len(); i++){
+		ExM.GetSampledGraph(G, PEdgeV[i]);
+		tridCnt.Clr();
 		tm.Tick();
 		for (int k=0; k<ExM.Rpt; k++) TSnap::GetTriadParticipAll(G, tridCnt);
-		printf("PEdge = %g: %.2f secs.\n", ps[i], tm.GetSecs()/ExM.Rpt);
+		PTmPr.Add(TFltPr(PEdgeV[i], tm.GetSecs()/ExM.Rpt));
 	}
+	BIO::SaveFltPrV(PTmPr, ExM.GetEfFNm(), "%g\t%.2f");
 }
-
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
@@ -113,6 +114,7 @@ int main(int argc, char* argv[]){
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const int CPU = Env.GetIfArgPrefixInt("-cpu:", std::thread::hardware_concurrency(), "# of CPUs");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
+	const TFltV PeV = Env.GetIfArgPrefixFltV("-ps:", "Edge sampling rates");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth (multi-core)"
 				"\n\tc: get UC groundtruth (simple)"
@@ -127,7 +129,7 @@ int main(int argc, char* argv[]){
 		printf("Saved to\n  %s\n  %s\n", ExM.GetGTFNm().CStr(), ExM.GetNTFNm().CStr());
 	} else if (Fmts.SearchCh('e') != -1) {
 		ExM.SetActionGraph(GFNm).SetRepeat(Rpt);
-		eval_efficiency(ExM);
+		eval_efficiency(ExM, PeV);
 	} else if (Fmts.SearchCh('c') != -1) {
 		ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetPEdge(1).SetPSocial(1);
 		UC_groundtruth(ExM);
