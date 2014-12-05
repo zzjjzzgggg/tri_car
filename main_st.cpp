@@ -103,7 +103,7 @@ void eval_efficiency(ExamMgr& ExM, TFltV PEdgeV){
 		for (int k=0; k<ExM.Rpt; k++) TSnap::GetTriadParticipAll(G, tridCnt);
 		PTmPr.Add(TFltPr(PEdgeV[i], tm.GetSecs()/ExM.Rpt));
 	}
-	BIO::SaveFltPrV(PTmPr, ExM.GetEfFNm(), "%g\t%.2f");
+	BIO::SaveFltPrV(PTmPr, ExM.GetEfFNm(), "%.2f\t%.2f");
 }
 
 int main(int argc, char* argv[]){
@@ -130,6 +130,7 @@ int main(int argc, char* argv[]){
 	} else if (Fmts.SearchCh('e') != -1) {
 		ExM.SetActionGraph(GFNm).SetRepeat(Rpt);
 		eval_efficiency(ExM, PeV);
+		printf("Saved to %s\n", ExM.GetEfFNm().CStr());
 	} else if (Fmts.SearchCh('c') != -1) {
 		ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetPEdge(1).SetPSocial(1);
 		UC_groundtruth(ExM);
