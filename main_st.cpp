@@ -91,18 +91,30 @@ void samle_graph(ExamMgr& ExM){
 }
 
 
-void eval_efficiency(ExamMgr& ExM, TFltV PEdgeV){
+void ef_sub(const int id, ExamMgr& ExM, const double Pe, TFlt& secs){
 	TIntPrV tridCnt;
-	TExeTm tm;
 	PNEGraph G = PNEGraph::TObj::New();
+	ExM.GetSampledGraph(G, Pe);
+	TExeTm tm;
+	TSnap::GetTriadParticipAll(G, tridCnt);
+	secs = tm.GetSecs();
+}
+
+void multi_eval_efficiency(ExamMgr& ExM, const TFltV& PeV){
+	TExeTm tm;
 	TFltPrV PTmPr;
-	for (int i=0; i<PEdgeV.Len(); i++){
-		printf("Sampling with rate: %.2f\n", PEdgeV[i].Val);
-		ExM.GetSampledGraph(G, PEdgeV[i]);
-		tridCnt.Clr();
-		tm.Tick();
-		for (int k=0; k<ExM.Rpt; k++) TSnap::GetTriadParticipAll(G, tridCnt);
-		PTmPr.Add(TFltPr(PEdgeV[i], tm.GetSecs()/ExM.Rpt));
+	TFltV Tms(ExM.CPU);
+	for (int k =0; k<PeV.Len(); k++){
+		const double Pe = PeV[k];
+		printf("Sampling with rate: %.2f\n", Pe);
+		std::vector<std::thread> threads;
+		for (int i=0; i<ExM.CPU; i++) {
+			Tms[i] = 0;
+			threads.emplace_back([i, &ExM, &Pe, &Tms] { ef_sub(i, ExM, Pe, Tms[i]); });
+		}
+		for(std::thread& t: threads) t.join();
+		for (int i=1; i<ExM.CPU; i++) Tms[0] += Tms[i];
+		PTmPr.Add(TFltPr(Pe, Tms[0]/ExM.CPU));
 	}
 	BIO::SaveFltPrV(PTmPr, ExM.GetEfFNm(), "%.2f\t%.2f");
 }
@@ -130,7 +142,7 @@ int main(int argc, char* argv[]){
 		printf("Saved to\n  %s\n  %s\n", ExM.GetGTFNm().CStr(), ExM.GetNTFNm().CStr());
 	} else if (Fmts.SearchCh('e') != -1) {
 		ExM.SetActionGraph(GFNm).SetRepeat(Rpt);
-		eval_efficiency(ExM, PeV);
+		multi_eval_efficiency(ExM, PeV);
 		printf("Saved to %s\n", ExM.GetEfFNm().CStr());
 	} else if (Fmts.SearchCh('c') != -1) {
 		ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetPEdge(1).SetPSocial(1);
