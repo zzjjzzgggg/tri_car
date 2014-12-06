@@ -130,6 +130,7 @@ void multi_ef(ExamMgr& ExM, const TFltV& PeV){
 		KeyTmH.GetKeyDat(kid, Key, SumTm);
 		AvgV.Add(TFltPr(PeV[Key], SumTm/ExM.Rpt/1000));
 	}
+	AvgV.Sort();
 	BIO::SaveFltPrV(AvgV, ExM.GetEfFNm(), "%.2f\t%.2f");
 }
 
