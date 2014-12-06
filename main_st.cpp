@@ -7,6 +7,7 @@
 
 #include <queue>
 #include <condition_variable>
+#include <chrono>
 
 #include "stdafx.h"
 #include "Queue.h"
@@ -91,33 +92,47 @@ void samle_graph(ExamMgr& ExM){
 }
 
 
-void ef_sub(const int id, ExamMgr& ExM, const double Pe, TFlt& secs){
+void sub_ef(const int id, Queue<TIntFltKd>& Que, ExamMgr& ExM, TIntFltKdV& TmV) {
+	TIntFltKd Item;
 	TIntPrV tridCnt;
 	PNEGraph G = PNEGraph::TObj::New();
-	ExM.GetSampledGraph(G, Pe);
-	TExeTm tm;
-	TSnap::GetTriadParticipAll(G, tridCnt);
-	secs = tm.GetSecs();
+	while (Que.TryPop(Item)) {
+		printf("[%d] %g\n", id, Item.Dat.Val);
+		ExM.GetSampledGraph(G, Item.Dat);
+		auto start = std::chrono::steady_clock::now();
+		TSnap::GetTriadParticipAll(G, tridCnt);
+		auto end = std::chrono::steady_clock::now();
+		double millsecs = std::chrono::duration<double, std::milli>(end-start).count();
+		TmV.Add(TIntFltKd(Item.Key, millsecs));
+	}
 }
 
-void multi_eval_efficiency(ExamMgr& ExM, const TFltV& PeV){
-	TExeTm tm;
-	TFltPrV PTmPr;
-	TFltV Tms(ExM.CPU);
-	for (int k =0; k<PeV.Len(); k++){
-		const double Pe = PeV[k];
-		printf("Sampling with rate: %.2f\n", Pe);
-		std::vector<std::thread> threads;
-		for (int i=0; i<ExM.CPU; i++) {
-			Tms[i] = 0;
-			threads.emplace_back([i, &ExM, &Pe, &Tms] { ef_sub(i, ExM, Pe, Tms[i]); });
-		}
-		for(std::thread& t: threads) t.join();
-		for (int i=1; i<ExM.CPU; i++) Tms[0] += Tms[i];
-		PTmPr.Add(TFltPr(Pe, Tms[0]/ExM.CPU));
+void multi_ef(ExamMgr& ExM, const TFltV& PeV){
+	Queue<TIntFltKd> Qu;
+	for (int key=0; key<PeV.Len(); key++)
+		for (int rpt=0; rpt<ExM.Rpt; rpt++)
+			Qu.Push(TIntFltKd(key, PeV[key]));
+	TIntFltKdV TmVs[ExM.CPU];
+	for (int n=0; n<ExM.CPU; n++) TmVs[n] = TIntFltKdV();
+
+	// assign threads
+	std::vector<std::thread> threads;
+	for (int n=0; n<ExM.CPU; n++) threads.emplace_back([n, &Qu, &ExM, &TmVs] { sub_ef(n, Qu, ExM, TmVs[n]); });
+	for(std::thread& t: threads) t.join();
+
+	// collect results
+	TIntFltH KeyTmH;
+	for (int n=0; n<ExM.CPU; n++)
+		for (int i=0; i<TmVs[n].Len(); i++)
+			KeyTmH(TmVs[n][i].Key) += TmVs[n][i].Dat;
+	TFltPrV AvgV; TInt Key; TFlt SumTm;
+	for (int kid = KeyTmH.FFirstKeyId(); KeyTmH.FNextKeyId(kid);) {
+		KeyTmH.GetKeyDat(kid, Key, SumTm);
+		AvgV.Add(TFltPr(PeV[Key], SumTm/ExM.Rpt/1000));
 	}
-	BIO::SaveFltPrV(PTmPr, ExM.GetEfFNm(), "%.2f\t%.2f");
+	BIO::SaveFltPrV(AvgV, ExM.GetEfFNm(), "%.2f\t%.2f");
 }
+
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
@@ -127,7 +142,9 @@ int main(int argc, char* argv[]){
 	const int Rpt = Env.GetIfArgPrefixInt("-r:", 10, "Repeat times");
 	const int CPU = Env.GetIfArgPrefixInt("-cpu:", std::thread::hardware_concurrency(), "# of CPUs");
 	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
-	const TFltV PeV = Env.GetIfArgPrefixFltV("-ps:", "Edge sampling rates");
+	TFltV PeDefV(6);
+	for (int i=0; i<PeDefV.Len(); i++) PeDefV[i] = 0.05*(i+1);
+	const TFltV PeV = Env.GetIfArgPrefixFltV("-ps:", PeDefV, "Edge sampling rates");
 	const TStr Fmts = Env.GetIfArgPrefixStr("-c:", "", "What to compute:"
 				"\n\tg: get groundtruth (multi-core)"
 				"\n\tc: get UC groundtruth (simple)"
@@ -141,8 +158,8 @@ int main(int argc, char* argv[]){
 		multi_groundtruth(ExM);
 		printf("Saved to\n  %s\n  %s\n", ExM.GetGTFNm().CStr(), ExM.GetNTFNm().CStr());
 	} else if (Fmts.SearchCh('e') != -1) {
-		ExM.SetActionGraph(GFNm).SetCPU(CPU);
-		multi_eval_efficiency(ExM, PeV);
+		ExM.SetActionGraph(GFNm).SetCPU(CPU).SetRepeat(Rpt);
+		multi_ef(ExM, PeV);
 		printf("Saved to %s\n", ExM.GetEfFNm().CStr());
 	} else if (Fmts.SearchCh('c') != -1) {
 		ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetPEdge(1).SetPSocial(1);
