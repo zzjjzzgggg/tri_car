@@ -4,20 +4,14 @@
  *  Created on: Sep 18, 2014
  *      Author: jzzhao
  */
-
-#include <queue>
-#include <condition_variable>
-#include <chrono>
-
 #include "stdafx.h"
-#include "Queue.h"
 #include "ExamMgr.h"
 
 
 /**
  * count the number of triangles in int-pair NIdCnt.
  */
-void sub_gt(const int id, Queue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
+void sub_gt(const int id, SynQueue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 	TExeTm2 tm;
 	int nid, ntrids;
 	printf("[%d] is ready.\n", id);
@@ -32,7 +26,7 @@ void sub_gt(const int id, Queue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 void multi_groundtruth(ExamMgr& ExM){
 	TExeTm tm;
 	// assign jobs
-	Queue<int> Qu;
+	SynQueue<int> Qu;
 	for (ExamMgr::NI NI=ExM.GFull->BegNI(); NI<ExM.GFull->EndNI(); NI++) Qu.Push(NI.GetId());
 	TIntPrV Vs[ExM.CPU];
 	for (int n=0; n<ExM.CPU; n++) Vs[n] = TIntPrV();
