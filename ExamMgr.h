@@ -55,6 +55,9 @@ public:
 	void Sample(TIntPrV& gV, const double Pe=-1);
 	void SampleUC(TIntPrV& gV);
 
+	void TrimTailTh(TFltV& ThV);
+	void TrimTailNTh(TFltV& ThV, const double Alpha);
+
 	TStr GetTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("th_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
 	TStr GetBTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("bth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }
 	TStr GetNTHFNm() const { return GFNm.GetFPath()+TStr::Fmt("nth_%s_W%dK_p%g.dist", GFNm.GetFMid().CStr(), W/1000, PEdge); }

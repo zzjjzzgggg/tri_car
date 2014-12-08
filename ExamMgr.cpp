@@ -85,3 +85,45 @@ int ExamMgr::CountTrids(const TIntPrV& TmUsrs){
 	}
 	return nTrids;
 }
+
+void ExamMgr::TrimTailTh(TFltV& ThV) {
+	double minval=1;
+	int Wp=1;
+	for (int i=0; i<=W; i++) {
+		if (ThV[i] < minval){
+			minval = ThV[i];
+			Wp = i;
+		}
+	}
+	double rem = 0;
+	for (int i=Wp+1; i<=W; i++) {
+		rem += ThV[i];
+		ThV[i] = 0;
+	}
+	for (int i=0; i<=Wp; i++) ThV[i] /= (1-rem);
+	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
+}
+
+
+void ExamMgr::TrimTailNTh(TFltV& ThV, const double Alpha) {
+	double minval=1, qth=0, qth_new = 0, rem = 0;
+	double Pd = FGFNm.Len()==0 ? GetPdUU() : GetPdUC();
+	int Wp=1;
+	for (int i=1; i<=W; i++) {
+		qth += ThV[i]*TSpecFunc::BetaBinomial(0, i, Pd/Alpha, (1-Pd)/Alpha);
+		if (ThV[i] < minval){
+			minval = ThV[i];
+			Wp = i;
+		}
+	}
+	for (int i=Wp+1; i<=W; i++) {
+		rem += ThV[i];
+		ThV[i] = 0;
+	}
+	for (int i=1; i<=Wp; i++) {
+		ThV[i] /= 1-rem;
+		qth_new += ThV[i]*TSpecFunc::BetaBinomial(0, i, Pd/Alpha, (1-Pd)/Alpha);
+	}
+	ThV[0] *= (1-qth)/(1-qth_new);
+	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
+}

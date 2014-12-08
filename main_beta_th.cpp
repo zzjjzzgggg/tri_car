@@ -27,24 +27,6 @@ void em_sub(const int id, ExamMgr& ExM, TFlt& alpha, TFltV& ThV){
 	printf("[%d] Experiment repeats %d times, and %d succeeded.\n", id, ExM.Rpt, NSuc);
 }
 
-void trim_tail(ExamMgr& ExM, TFltV& ThV){
-	double minval=1, Pd = ExM.GetPdUU();
-	int Wp=1;
-	for (int i=0; i<=ExM.W; i++) {
-		if (ThV[i] < minval){
-			minval = ThV[i];
-			Wp = i;
-		}
-	}
-	double rem = 0; // q_theta
-	for (int i=Wp+1; i<=ExM.W; i++) {
-		rem += ThV[i];
-		ThV[i] = 0;
-	}
-	for (int i=0; i<=Wp; i++) ThV[i] /= (1-rem);
-	printf("min val = %.2e   Wp=%d  rem = %.2e\n", minval, Wp, rem);
-}
-
 void em_multi(ExamMgr& ExM){
 	TExeTm tm;
 	TFltV Alphas(ExM.CPU), ThVs[ExM.CPU];
@@ -58,7 +40,7 @@ void em_multi(ExamMgr& ExM){
 		for (int n=1; n<ExM.CPU; n++) ThVs[0][i] += ThVs[n][i];
 		ThVs[0][i] /= ExM.CPU;
 	}
-	if (ExM.TrimTail) trim_tail(ExM, ThVs[0]);
+	if (ExM.TrimTail) ExM.TrimTailTh(ThVs[0]);
 	const TStr OFnm = ExM.GetBTHFNm();
 	BIO::SaveFltVWithIdx(ThVs[0], OFnm,
 		TStr::Fmt("# Nodes: %d\n# Repeated: %d. \n# Avg time cost: %.2f secs.\n# Alpha: %.6e",
