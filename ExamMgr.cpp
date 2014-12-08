@@ -43,34 +43,26 @@ void ExamMgr::Sample(TIntPrV& gV, const double Pe){
 }
 
 void ExamMgr::SampleUC(TIntPrV& gV){
-	PNEGraph G = PNEGraph::New();
 	PBNEGraph UCGSampled = PBNEGraph::TObj::New();
 	TRnd rnd;
 	// obtain sampled graph, i.e., UCG and partial G
-	for(TBNEGraph::TEdgeI ei=UCGFull->BegEI(); ei!=UCGFull->EndEI(); ei++){
+	for(TBNEGraph::TEdgeI ei=UCGFull->BegEI(); ei!=UCGFull->EndEI(); ei++) {
 		if(rnd.GetUniDev() > PEdge) continue;
 		const int u = ei.GetSrcNId(), c = ei.GetDstNId();
-		if(!G->IsNode(u)) G->AddNode(u);
-		if(!G->IsNode(c)) G->AddNode(c);
-		G->AddEdge(u, c);
 		if(!UCGSampled->IsSrcNode(u)) UCGSampled->AddSrcNode(u);
 		if(!UCGSampled->IsDstNode(c)) UCGSampled->AddDstNode(c);
 		UCGSampled->AddEdge(ei);
 	}
 	TIntPrV TmUsrV;
+	TIntH TridCntH;
 	for(TBNEGraph::TNodeI ni = UCGSampled->BegDstNI(); ni < UCGSampled->EndDstNI(); ni++){
 		if (ni.GetDeg()<2) continue;
 		for (int d=0; d<ni.GetDeg(); d++) {
 			TBNEGraph::TEdgeI ei = UCGSampled->GetEI(ni.GetEId(d));
 			TmUsrV.AddSorted(TIntPr(ei.GetDat(), ei.GetSrcNId()));
 		}
-		CheckSocialRelation(TmUsrV, G);
+		TridCntH(CountTrids(TmUsrV)) ++;
 		TmUsrV.Clr();
-	}
-	TIntH TridCntH;
-	for(TBNEGraph::TNodeI ni = UCGSampled->BegDstNI(); ni < UCGSampled->EndDstNI(); ni++){
-		const int card = TSnap::GetNodeTriadsAll<PNEGraph>(G, ni.GetId());
-		TridCntH(card) ++;
 	}
 	gV.Clr();
 	for (int id = TridCntH.FFirstKeyId(); TridCntH.FNextKeyId(id); ){
@@ -79,16 +71,17 @@ void ExamMgr::SampleUC(TIntPrV& gV){
 	}
 }
 
-void ExamMgr::CheckSocialRelation(const TIntPrV& TmUsrs, PNEGraph& G){
+int ExamMgr::CountTrids(const TIntPrV& TmUsrs){
 	TRnd rnd;
-	const int L = TmUsrs.Len();
-	for (int i=0; i<L; i++){
+	int L = TmUsrs.Len(), nTrids = 0;
+	for (int i=0; i<L-1; i++) {
 		const int u = TmUsrs[i].Val2;
-		for (int j=i+1; j<L; j++){
+		for (int j=i+1; j<L; j++) {
 			const int v = TmUsrs[j].Val2;
 			// check whether u <--- v with probability PRelation
 			if (u!=v && rnd.GetUniDev()<=PSocial && FGFull->IsEdge(v, u))
-				G->AddEdge(v, u);
+				nTrids ++;
 		}
 	}
+	return nTrids;
 }

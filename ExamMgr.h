@@ -22,7 +22,7 @@ public:
 	double PEdge, PSocial, alpha;
 	bool TrimTail;
 private:
-	void CheckSocialRelation(const TIntPrV& Users, PNEGraph& G);
+	int CountTrids(const TIntPrV& Users);
 public:
 	ExamMgr(): GFNm(""), FGFNm(""), N(0), W(10000), CPU(1), Rpt(12), BoundW(100),
 		PEdge(0.1), PSocial(0.1), alpha(0.0001),

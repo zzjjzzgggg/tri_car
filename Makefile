@@ -9,7 +9,7 @@ LDFLAGS += -lrt -pthread -std=c++11
 SNAPDIR = /home/jzzhao/git_project/netsnap
 LIB = -I $(SNAPDIR)/glib -I $(SNAPDIR)/snap 
 OBJ = Snap.o TCEM.o ExamMgr.o TCEMGeneral.o TCEMBetaBinom.o TCEMBetaBinomGeneral.o
-TAR = th nth st cth test beta_th beta_nth
+TAR = th nth st cth test beta_th beta_nth beta_cth
 
 all: test
 
@@ -36,6 +36,9 @@ beta_th: main_beta_th.cpp $(OBJ)
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 	
 beta_nth: main_beta_nth.cpp $(OBJ) 
+	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
+
+beta_cth: main_beta_cth.cpp $(OBJ) 
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
 
 TCEMBetaBinomGeneral.o: TCEMBetaBinomGeneral.cpp TCEMBetaBinomGeneral.h stdafx.h Snap.o

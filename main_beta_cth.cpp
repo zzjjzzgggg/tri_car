@@ -9,12 +9,11 @@
 #include "TCEMBetaBinomGeneral.h"
 #include "ExamMgr.h"
 
-
 void em_sub(const int id, ExamMgr& ExM, TFlt& alpha, TFltV& ThV){
 	int NSuc = 0; TIntPrV gV;
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("[%d] rpt = %d\n", id, rpt);
-		ExM.Sample(gV);
+		ExM.SampleUC(gV);
 		TCEMBetaBinomGeneral EM(ExM.W, ExM.BoundW, ExM.GetPdUU(), ExM.alpha, gV);
 		if (EM.Run()) {
 			alpha += EM.alpha;
@@ -69,22 +68,25 @@ void em_multi(ExamMgr& ExM) {
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
+
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
-	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "", "Input graph");
+	const TStr GFNm = Env.GetIfArgPrefixStr("-i:", "uc.graph", "User-cont interaction graph");
+	const TStr FGFNm = Env.GetIfArgPrefixStr("-f:", "fg.graph", "Follower graph");
 	const int W = Env.GetIfArgPrefixInt("-w:", 10000, "W");
-	const int BW = Env.GetIfArgPrefixInt("-bw:", 100, "W upper bound");
 	const int CPU = Env.GetIfArgPrefixInt("-cpu:", std::thread::hardware_concurrency(), "# of CPUs");
-	const int Rpt = Env.GetIfArgPrefixInt("-r:", 100/CPU, "Repeat times");
-	const double Pe = Env.GetIfArgPrefixFlt("-p:", 0.1, "Edge sampling rate");
+	const int Rpt = Env.GetIfArgPrefixInt("-r:", 100/CPU, "Repeat");
+	const int BW = Env.GetIfArgPrefixInt("-bw:", 100, "W upper bound");
+	const double Pe = Env.GetIfArgPrefixFlt("-pe:", 0.1, "Edge sampling rate");
+	const double Pr = Env.GetIfArgPrefixFlt("-pr:", 0.1, "Relation sampling rate");
 	const double alpha = Env.GetIfArgPrefixFlt("-alpha:", 0.0001, "alpha");
 	const bool TrimTail = Env.GetIfArgPrefixBool("-t:", false, "Trim tail");
 	if (Env.IsEndOfRun())  return 0;
 
-	TExeTm2 tm;
 	ExamMgr ExM;
-	ExM.SetActionGraph(GFNm).SetW(W).SetPEdge(Pe).SetRepeat(Rpt).SetCPU(CPU).IsTrimTail(TrimTail).SetBoundW(BW).SetAlpha(alpha);
+	TExeTm2 tm;
+	ExM.SetSocialGraph(FGFNm).SetActionGraph(GFNm).SetW(W).SetPEdge(Pe).SetPSocial(Pr).SetRepeat(Rpt).SetCPU(CPU).IsTrimTail(TrimTail);
 	em_multi(ExM);
 	printf("Cost time: %s.\n", tm.GetStr());
 	return 0;
