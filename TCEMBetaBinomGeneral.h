@@ -28,7 +28,7 @@ private:
 	double GetA(const int i, const int j) const { return TSpecFunc::BetaBinomial(j, i, Pd/alpha, (1-Pd)/alpha) / (1-TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha)); }
 	double GetQ(const int i) const { return TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha); }
 	void EStep();
-	bool MStep_theta(const double Eps=0.002);
+	bool MStep_theta(const double Eps=0.005);
 	bool MStep_alpha(const double Eps=0.0001, const int MxNewtonIters = 100);
 	void Scale();
 public:

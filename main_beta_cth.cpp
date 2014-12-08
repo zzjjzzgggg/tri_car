@@ -14,7 +14,7 @@ void em_sub(const int id, ExamMgr& ExM, TFlt& alpha, TFltV& ThV){
 	for (int rpt=0; rpt<ExM.Rpt; rpt++){
 		printf("[%d] rpt = %d\n", id, rpt);
 		ExM.SampleUC(gV);
-		TCEMBetaBinomGeneral EM(ExM.W, ExM.BoundW, ExM.GetPdUU(), ExM.alpha, gV);
+		TCEMBetaBinomGeneral EM(ExM.W, ExM.BoundW, ExM.GetPdUC(), ExM.alpha, gV);
 		if (EM.Run()) {
 			alpha += EM.alpha;
 			for (int i=0; i<=ExM.W; i++) ThV[i] += EM.ThV[i];
@@ -27,7 +27,7 @@ void em_sub(const int id, ExamMgr& ExM, TFlt& alpha, TFltV& ThV){
 }
 
 void trim_tail(ExamMgr& ExM, TFltV& ThV, const double alpha){
-	double minval=1, Pd = ExM.GetPdUU(), qth=0, qth_new = 0, rem = 0; // q_theta
+	double minval=1, Pd = ExM.GetPdUC(), qth=0, qth_new = 0, rem = 0; // q_theta
 	int Wp=1;
 	for (int i=1; i<=ExM.W; i++) {
 		qth += ThV[i]*TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha);
@@ -41,7 +41,7 @@ void trim_tail(ExamMgr& ExM, TFltV& ThV, const double alpha){
 		ThV[i] = 0;
 	}
 	for (int i=1; i<=Wp; i++){
-		ThV[i] /= (1-rem);
+		ThV[i] /= 1-rem;
 		qth_new += ThV[i]*TSpecFunc::BetaBinomial(0, i, Pd/alpha, (1-Pd)/alpha);
 	}
 	ThV[0] *= (1-qth)/(1-qth_new);
