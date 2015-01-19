@@ -22,7 +22,8 @@ th: main_th.cpp $(OBJ)
 
 nth: main_nth.cpp $(OBJ)
 	g++ $(DEBUG) $(OBJ) $(LDFLAGS) $(LIB) -o $@ $<
-	st: main_st.cpp $(OBJ)
+
+st: main_st.cpp $(OBJ)
 	g++ $(DEBUG) $(OBJ)  $(LDFLAGS) $(LIB) -o $@ $<
 
 cth: main_cth.cpp $(OBJ)
