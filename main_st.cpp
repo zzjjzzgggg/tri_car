@@ -22,7 +22,6 @@ void sub_gt(const int id, SynQueue<int>& Que, ExamMgr& ExM, TIntPrV& NIdCnt) {
 	printf("[%d] costs time: %s\n", id, tm.GetStr());
 }
 
-
 void multi_groundtruth(ExamMgr& ExM){
 	TExeTm tm;
 	// assign jobs
@@ -61,7 +60,6 @@ void multi_groundtruth(ExamMgr& ExM){
 	fclose(fw);
 }
 
-
 void UC_groundtruth(ExamMgr& ExM){
 	TExeTm tm;
 	TIntPrV gV;
@@ -78,15 +76,13 @@ void UC_groundtruth(ExamMgr& ExM){
 	fclose(fw);
 }
 
-
 void samle_graph(ExamMgr& ExM){
 	PNEGraph G = PNEGraph::TObj::New();
 	ExM.GetSampledGraph(G);
 	TSnap::SaveEdgeList<PNEGraph>(G, ExM.GetSGFNm());
 }
 
-
-void sub_ef(const int id, Queue<TIntFltKd>& Que, ExamMgr& ExM, TIntFltKdV& TmV) {
+void sub_ef(const int id, SynQueue<TIntFltKd>& Que, ExamMgr& ExM, TIntFltKdV& TmV) {
 	TIntFltKd Item;
 	TIntPrV tridCnt;
 	PNEGraph G = PNEGraph::TObj::New();
@@ -102,7 +98,7 @@ void sub_ef(const int id, Queue<TIntFltKd>& Que, ExamMgr& ExM, TIntFltKdV& TmV) 
 }
 
 void multi_ef(ExamMgr& ExM, const TFltV& PeV){
-	Queue<TIntFltKd> Qu;
+	SynQueue<TIntFltKd> Qu;
 	for (int key=0; key<PeV.Len(); key++)
 		for (int rpt=0; rpt<ExM.Rpt; rpt++)
 			Qu.Push(TIntFltKd(key, PeV[key]));
@@ -127,7 +123,6 @@ void multi_ef(ExamMgr& ExM, const TFltV& PeV){
 	AvgV.Sort();
 	BIO::SaveFltPrV(AvgV, ExM.GetEfFNm(), "%.2f\t%.2f");
 }
-
 
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);

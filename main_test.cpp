@@ -322,11 +322,15 @@ void test_convergence(){
 	printf("%d, alpha=%.4f\n", cnt,alpha);
 }
 
+void test_emacs(){
+	for (int i=0; i<10; i++)
+		printf("%d\n", i);
+}
+
 int main(int argc, char* argv[]){
 //	dist_triangles(22);
 //	spam_rnd(10);
 //	spam_friend(10);
-
 
 	test_convergence();
 	return 0;
