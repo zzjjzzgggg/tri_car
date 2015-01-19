@@ -46,7 +46,6 @@ void em_multi(ExamMgr& ExM) {
 	printf("Saved to %s\n", OFnm.CStr());
 }
 
-
 int main(int argc, char* argv[]){
 	Env = TEnv(argc, argv, TNotify::StdNotify);
 	Env.PrepArgs(TStr::Fmt("Build: %s, %s. Time: %s", __TIME__, __DATE__, TExeTm::GetCurTm()));
