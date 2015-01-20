@@ -32,7 +32,8 @@ void em_multi(ExamMgr& ExM){
 	TFltV Alphas(ExM.CPU), ThVs[ExM.CPU];
 	for (int i=0; i<ExM.CPU; i++) ThVs[i] = TFltV(ExM.W+1);
 	std::vector<std::thread> threads;
-	for (int i=0; i<ExM.CPU; i++) threads.emplace_back([i, &ExM, &Alphas, &ThVs] { em_sub(i, ExM, Alphas[i], ThVs[i]); });
+	for (int i=0; i<ExM.CPU; i++)
+		threads.emplace_back([i, &ExM, &Alphas, &ThVs]{ em_sub(i, ExM, Alphas[i], ThVs[i]); });
 	for(std::thread& t: threads) t.join();
 	for (int n=1; n<ExM.CPU; n++) Alphas[0] += Alphas[n];
 	Alphas[0] /= ExM.CPU;

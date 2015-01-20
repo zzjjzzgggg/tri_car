@@ -27,10 +27,10 @@ private:
 	int Idx(const int i, const int j) const { return (i<=M) ? (i*(i+1)/2+j) : ((M+1)*(M+2)/2+(i-M-1)*(M+1)+j); }
 	void EStep();
 	bool MStep_theta(const double Eps=0.005);
-	bool MStep_alpha(const double Eps=0.0001, const int MxNewtonIters = 100);
+	bool MStep_alpha(const double Eps=0.0002, const int MxNewtonIters = 200);
 public:
-	TCEMBetaBinom(const int W, const int N, const int BW, const double Pd, const double alpha, const TIntPrV& igV):
-		W(W), N(N), BoundW(BW), Pd(Pd), alpha(alpha) {
+	TCEMBetaBinom(const int W, const int N, const int BW, const double Pd,
+				  const double alpha, const TIntPrV& igV): W(W), N(N), BoundW(BW), Pd(Pd), alpha(alpha) {
 		M = g = 0;
 		for (int i=0; i<igV.Len(); i++) {
 			const int card = igV[i].Val1, freq = igV[i].Val2;
@@ -43,7 +43,8 @@ public:
 		gV.Add(TIntPr(0, N-g));
 
 		// init ThV
-		ThV.Gen(W+1);ThV_pre.Gen(W+1);
+		ThV.Gen(W+1);
+		ThV_pre.Gen(W+1);
 //		TRandom::InitUni(ThV);
 
 		TRnd Rnd;
